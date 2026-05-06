@@ -10,12 +10,13 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 mkdir -p /mnt
+
+# Creating swap file
 mount $1 /mnt
 btrfs subvolume create /mnt/@swap
-btrfs subvolume create /mnt/@storage
 umount /mnt
-mkdir -p /swap /storage
+mkdir -p /swap
 mount $1 /swap -o subvol=@swap
-mount $1 /storage -o subvol=@storage
+
 nixos-generate-config --show-hardware-config > hardware-configuration.nix
 nixos-rebuild boot --flake .#GubbServer
