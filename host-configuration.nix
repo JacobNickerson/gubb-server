@@ -5,6 +5,7 @@
   ];
 
   fileSystems."/".options = [ "compress=zstd:1" "noatime" ];
+  fileSystems."/home".options = [ "compress=zstd:1" "noatime" ];
   fileSystems."/storage".options = [ "compress=zstd:3" "noatime" ];
   fileSystems."/swap".options = [ "compress=no" "nodatacow" "noatime" ];
   swapDevices = lib.mkForce [
