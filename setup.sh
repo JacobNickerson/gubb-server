@@ -11,7 +11,6 @@ fi
 
 mkdir -p /mnt
 
-# Creating swap file
 mount $1 /mnt
 btrfs subvolume create /mnt/@swap
 umount /mnt
