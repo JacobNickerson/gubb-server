@@ -26,7 +26,6 @@
 
 		functions = {
 			fish_greeting = ''
-				fastfetch
 			'';
 			fish_prompt = ''
 				set_color e18384; echo -n (whoami)
