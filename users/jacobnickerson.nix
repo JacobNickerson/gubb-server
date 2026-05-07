@@ -13,7 +13,7 @@ in {
 	config.users.users.jacobnickerson = {
 		isNormalUser = true;
 		description = "Jacob Nickerson";
-		extraGroups = [ "networkmanager" "wheel" ];
+		extraGroups = [ "networkmanager" "wheel" "smb" ];
 		shell = pkgs.fish;
 		packages = with pkgs; [];
 	};
