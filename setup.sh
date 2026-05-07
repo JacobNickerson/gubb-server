@@ -17,5 +17,10 @@ umount /mnt
 mkdir -p /swap
 mount $1 /swap -o subvol=@swap
 
+groupadd smb
+mkdir -p /storage/gubb
+chown -R root:smb /storage/gubb
+chmod 770 /storage/gubb
+
 nixos-generate-config --show-hardware-config > hardware-configuration.nix
 nixos-rebuild boot --flake .#GubbServer

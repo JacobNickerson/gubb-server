@@ -7,6 +7,7 @@
 {
   imports = [
     ./modules/openssh.nix
+    ./modules/samba.nix
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
