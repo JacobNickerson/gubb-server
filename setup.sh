@@ -8,6 +8,10 @@ if [ "$EUID" -ne 0 ]; then
   echo "error: must be run as sudo"
   exit 1
 fi
+if [ ! -d /storage ]; then
+  echo "error: storage partition must be mounted at /storage"
+  exit 1
+fi
 
 mkdir -p /mnt
 
