@@ -1,5 +1,6 @@
 { inputs, config, pkgs, ... }: let
-	home_dir = "/home/jacobnickerson";
+  user_name = "jacobnickerson";
+	home_dir = "/home/${user_name}";
   flake_path = "${home_dir}/gubb-server";
 	imports = [
 		./modules/fish.nix
@@ -21,7 +22,7 @@ in {
 		fonts.fontconfig.enable = true;
 
 		home = {
-			username = "jacobnickerson";
+			username = user_name;
 			homeDirectory = home_dir;
 			stateVersion = "25.11"; 
 
