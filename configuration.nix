@@ -57,8 +57,8 @@
     rar
   ];
 
-  # Environment Variables
   environment.sessionVariables = {
+
   };
   environment.variables = {
     EDITOR = "vim";

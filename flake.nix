@@ -5,7 +5,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
     	url = "github:nix-community/home-manager";
-	inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -25,14 +25,14 @@
         specialArgs = { inherit inputs; };
         modules = [
           ({ ... }: { networking.hostName = hostname; })
-	  config
-	  hostConfig
-	  home-manager.nixosModules.home-manager
-    {
-      home-manager.useGlobalPkgs = true;
-      home-manager.useUserPackages = true;
-      home-manager.extraSpecialArgs = { inherit inputs; hostname = hostname; };
-	  }
+          config
+          hostConfig
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = { inherit inputs; hostname = hostname; };
+          }
         ] ++ users;
       };  
   in {
@@ -40,7 +40,7 @@
       GubbServer = mkHost {
         hostname = "GubbServer";
         config = ./configuration.nix;
-	hostConfig = ./host-configuration.nix;
+        hostConfig = ./host-configuration.nix;
         users = [
           ./users/jacobnickerson.nix
         ];
