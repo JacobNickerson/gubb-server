@@ -43,6 +43,7 @@
         hostConfig = ./host-configuration.nix;
         users = [
           ./users/jacobnickerson.nix
+          ./users/slyniashi.nix
         ];
       };
     };
