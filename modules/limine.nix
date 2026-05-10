@@ -8,7 +8,7 @@
   boot.loader = lib.mkForce {
     systemd-boot.enable = false;
     limine.enable = true;
-    limine.secureBoot.enable = false;  # Enroll keys then set to true
+    limine.secureBoot.enable = true;
     efi.canTouchEfiVariables = true;
   };
   boot.kernelPackages = pkgs.linuxPackages_latest;
