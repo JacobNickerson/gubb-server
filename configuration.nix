@@ -7,18 +7,11 @@
 {
   imports = [
     ./modules/openssh.nix
+    ./modules/limine.nix
     ./modules/samba.nix
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-  boot = {
-    loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
-    };
-    kernelPackages = pkgs.linuxPackages_latest;
-  };
 
   networking.wireless.enable = false;
   networking.wireless.iwd.enable = true;
