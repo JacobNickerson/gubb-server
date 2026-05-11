@@ -1,11 +1,12 @@
 { port ? 42167, ext_interface ? "eth0", subnet_prefix ? "10.0.0", int_interface ? "wg0" }:
 { config, pkgs, ... }:
 let
-  key_dir = "/etc/wireguard";
+  key_dir = "/etc/systemd/network/keys";
   key_file = "${key_dir}/${int_interface}.key";
 in
 {
   networking.useNetworkd = true;
+  networking.wireguard.enable = true;
 
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1;
@@ -36,12 +37,13 @@ in
   };
 
   systemd.tmpfiles.rules = [
-    "d ${key_dir} 0700 root root -"
+    "d ${key_dir} 0750 root systemd-network -"
   ];
   system.activationScripts.wireguard-key = ''
     if [ ! -f ${key_file} ]; then
-      umask 077
       ${pkgs.wireguard-tools}/bin/wg genkey > ${key_file}
+      chown root:systemd-network ${key_file}
+      chmod 640 ${key_file}
     fi
   '';
 

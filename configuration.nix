@@ -9,14 +9,18 @@
     ./modules/openssh.nix
     ./modules/limine.nix
     ./modules/samba.nix
+    (import ./modules/wireguard.nix { ext_interface = "enp1s0"; subnet_prefix = "100.100.0"; })
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  networking.wireless.enable = false;
-  networking.wireless.iwd.enable = true;
-  networking.networkmanager.enable = true;
-  networking.networkmanager.wifi.backend = "iwd";
+  networking = {
+    wireless.enable = false;
+    wireless.iwd.enable = true;
+    networkmanager.enable = true;
+    networkmanager.wifi.backend = "iwd";
+    firewall.enable = true;
+  };
 
   time.timeZone = "America/New_York";
 
@@ -37,7 +41,6 @@
     layout = "us";
     variant = "";
   };
-  programs.fish.enable = true;
 
   environment.systemPackages = with pkgs; [
     vim
