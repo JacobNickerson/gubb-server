@@ -27,12 +27,10 @@ in
   systemd.network.networks."50-${int_interface}" = {
     matchConfig.Name = int_interface;
 
-    address = [
-      "${subnet_prefix}.1/24"
-    ];
+    address = [ "${subnet_prefix}.1/24" ];
 
     networkConfig = {
-      DNS = "${subnet_prefix}.1";
+      #DNS = "${subnet_prefix}.1"; TODO: enable if setting up DNS resolver
     };
   };
 
@@ -61,7 +59,7 @@ in
 
     wireguardPeers = [
       { # PortaJake
-        PublicKey = "PORTA_JAKE_KEY";
+        PublicKey = "q0PVIe44Zhduc7SHLpWvxrGROEvEZmawMVj7fAfrIxM=";
         AllowedIPs = [ "${subnet_prefix}.2/32" ];
         PersistentKeepalive = 25;
       }
