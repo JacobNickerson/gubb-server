@@ -9,7 +9,7 @@
     ./modules/openssh.nix
     ./modules/limine.nix
     ./modules/samba.nix
-    (import ./modules/wireguard.nix { ext_interface = "enp1s0"; subnet_prefix = "100.100.0"; })
+    (import ./modules/wireguard.nix { ext_interface = "enp1s0"; subnet_prefix = "10.100.0"; })
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
