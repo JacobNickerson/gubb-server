@@ -21,11 +21,5 @@ umount /mnt
 mkdir -p /swap
 mount $1 /swap -o subvol=@swap
 
-# New group is defined in nix config, but must be added here since this script is run before nix config
-groupadd smb
-mkdir -p /storage/gubb
-chown -R root:smb /storage/gubb
-chmod 770 /storage/gubb
-
 nixos-generate-config --show-hardware-config > hardware-configuration.nix
 nixos-rebuild boot --flake .#GubbServer

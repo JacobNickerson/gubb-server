@@ -1,6 +1,12 @@
 { config, ... }:
+let
+  smb_dir = "/storage/gubb";
+in
 {
   users.groups.smb = {};
+  systemd.tmpfiles.rules = [
+    "d ${smb_dir} 0770 root smb -"
+  ];
   services.samba = {
     enable = true;
     openFirewall = true;
@@ -32,7 +38,4 @@
     enable = true;
     openFirewall = true;
   };
-
-  networking.firewall.enable = true;
-  networking.firewall.allowPing = true;
 }
