@@ -24,6 +24,6 @@
 	};
 
 	users.users."jacobnickerson".openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOGsgM2ftNlPvn8Vltsj3+WuHhVZHMIW+5Iqk2ajfXJi jacobnickerson@PortaJake"
+		"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOGsgM2ftNlPvn8Vltsj3+WuHhVZHMIW+5Iqk2ajfXJi jacobnickerson@PortaJake"
 	];
 }
