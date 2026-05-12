@@ -1,6 +1,6 @@
 { config, ... }:
 let
-  smb_dir = "/storage/gubb";
+  smb_dir = "/srv/nas";
 in
 {
   users.groups.smb = {};
@@ -23,7 +23,7 @@ in
         "min protocol" = "SMB2";
       };
       "gubb-storage" = {
-        "path" = "/storage/gubb";
+        "path" = "${smb_dir}";
         "browseable" = "yes";
         "read only" = "no";
         "guest ok" = "no";

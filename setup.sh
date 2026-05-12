@@ -25,7 +25,6 @@ mkdir -p /mnt
 mount $1 /mnt
 btrfs subvolume create /mnt/@swap
 umount /mnt
-mkdir -p /swap
 mount $1 /swap -o subvol=@swap
 
 echo "Building system..."

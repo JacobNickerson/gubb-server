@@ -31,7 +31,7 @@
       options = [ "subvol=@swap" ];
     };
 
-  fileSystems."/storage" =
+  fileSystems."/srv" =
     { device = "/dev/disk/by-uuid/40f5d62f-99d4-4a6e-8b34-e7e9afaf5d36";
       fsType = "btrfs";
     };
