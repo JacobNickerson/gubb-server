@@ -14,10 +14,10 @@ if [ ! -d /storage ]; then
 fi
 
 echo "Generating secure boot keys..."
-nix-shell -p sbctl --command "sbctl create-keys"
-if [ ! -d /var/lib/sbctl/keys ]; then
-  echo "error: failed to generate secure boot keys"
-  exit 1
+nix-shell -p sbctl --command "sbctl create-keys && sbctl enroll-keys --microsoft --firmware-builtin"
+if [ ! $? -eq 0 ]; then
+  echo "error: failed to sign bootloader"
+  exit $?
 fi
 
 echo "Creating swap subvolume..."
