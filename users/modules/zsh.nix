@@ -55,5 +55,11 @@
       ignoreDups = true;
       share = true;
     };
+
+    historySubstringSearch = {
+      enable = true;
+      searchUpKey = "^[[A";
+      searchDownKey = "^[[B";
+    };
   };
 }
