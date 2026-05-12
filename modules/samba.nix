@@ -16,7 +16,7 @@ in
         "server string" = "Gubb NAS";
         "netbios name" = "gubbserver";
         "security" = "user";
-        "hosts allow" = "192.168.";
+        "hosts allow" = "192.168. 10.100.0.";
         "hosts deny" = "0.0.0.0/0";
         "guest account" = "nobody";
         "map to guest" = "bad user";
