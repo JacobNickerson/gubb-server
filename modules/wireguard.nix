@@ -63,6 +63,14 @@ in
         AllowedIPs = [ "${subnet_prefix}.2/32" ];
         PersistentKeepalive = 25;
       }
+      { # PhoneJake
+        PublicKey = "e+sZpu+5OfFn5Lxqsb/sytqv1auf07HgxzUS0oT4Cmg=";
+        AllowedIPs = [ "${subnet_prefix}.3/32" ];
+      }
+      { # BunPhone
+        PublicKey = "h4WOuljd3KTSWDJ6bWISmJhi46FWAqO+LvD4sPgUkHc=";
+        AllowedIPs = [ "${subnet_prefix}.5/32" ];
+      }
     ];
   };
 
