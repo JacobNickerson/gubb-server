@@ -3,14 +3,9 @@
 let
   dataDir = "/srv/immich";
   uploadDir = "${dataDir}/storage";
-
+  
   dbName = "immich";
   dbUser = "immich";
-  dbHost = "127.0.0.1";
-  dbPort = 5423;
-
-  redisHost = "127.0.0.1";
-  redisPort = 6379;
 in
 {
   systemd.tmpfiles.rules = [
@@ -32,19 +27,13 @@ in
 
     #accelerationDevices = null;
 
-    redis = {
-      enable = true;
-      host = redisHost;
-      port = redisPort;
-    };
+    redis.enable = true;
 
     database = {
       enable = true;
       createDB = true;
       name = dbName;
       user = dbUser;
-      host = dbHost;
-      port = dbPort;
     };
 
     machine-learning.enable = false;
