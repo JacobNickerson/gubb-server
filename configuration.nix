@@ -1,17 +1,13 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, ... }:
 
 {
   imports = [
+    ./modules/immich.nix
     ./modules/openssh.nix
     ./modules/limine.nix
     ./modules/samba.nix
-    (import ./modules/wireguard.nix { ext_interface = "enp1s0"; subnet_prefix = "10.100.0"; })
+    (import ./modules/wireguard.nix { ext_interface = "enp3s0f4u2"; subnet_prefix = "10.100.0"; })
   ];
-
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   networking = {
@@ -64,8 +60,18 @@
 
   systemd.tmpfiles.rules = [
     "d /srv 755 root root -"
+    "d /srv/postgresql 750 postgres postgres -"
     "d /swap 755 root root -"
   ];
+  
+  services.postgresql.dataDir = "/srv/postgresql";
+
+  # Allowing lid to close
+  services.logind = {
+    lidSwitch = "ignore";
+    lidSwitchDocked = "ignore";
+    lidSwitchExternalPower = "ignore";
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
