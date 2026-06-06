@@ -2,12 +2,21 @@
 
 {
   imports = [
-    ./modules/immich.nix
-    ./modules/openssh.nix
-    ./modules/limine.nix
-    ./modules/samba.nix
-    (import ./modules/wireguard.nix { ext_interface = "enp3s0f4u2"; subnet_prefix = "10.100.0"; })
+    ./modules/myModules.nix
   ];
+
+  myModules = {
+    immich.enable = true;
+    limine.enable = true;
+    openssh.enable = true;
+    samba.enable = true;
+    wireguard = {
+      enable = true;
+      ext_interface = "enp3s0f4u2";
+      subnet_prefix = "10.100.0";
+    };
+  };
+
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   networking = {
