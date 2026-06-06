@@ -76,10 +76,10 @@
   services.postgresql.dataDir = "/srv/postgresql";
 
   # Allowing lid to close
-  services.logind = {
-    lidSwitch = "ignore";
-    lidSwitchDocked = "ignore";
-    lidSwitchExternalPower = "ignore";
+  services.logind.settings.Login = {
+    HandleLidSwitch = "ignore";
+    HandleLidSwitchDocked = "ignore";
+    HandleLidSwitchExternalPower = "ignore";
   };
 
   # This value determines the NixOS release from which the default
