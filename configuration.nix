@@ -15,6 +15,10 @@
       ext_interface = "enp3s0f4u2";
       subnet_prefix = "10.100.0";
     };
+    restic = {
+      enable = true;
+      repo = "b2:gubb-server:/";
+    };
   };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
