@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ./home-assistant.nix
     ./immich.nix
     ./limine.nix
     ./openssh.nix

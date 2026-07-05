@@ -6,6 +6,7 @@
   ];
 
   myModules = {
+    home-assistant.enable = true;
     immich.enable = true;
     limine.enable = true;
     openssh.enable = true;
