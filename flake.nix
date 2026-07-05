@@ -2,14 +2,15 @@
   description = "GubbServer Configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
     	url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    vscode-server.url = "github:nix-community/nixos-vscode-server";
   };
 
-  outputs = { nixpkgs, home-manager, ... }@inputs:
+  outputs = { nixpkgs, home-manager, vscode-server, ... }@inputs:
   let
     system = "x86_64-linux";
 
@@ -33,6 +34,7 @@
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = { inherit inputs; hostname = hostname; };
           }
+          vscode-server.nixosModules.default
         ] ++ users;
       };  
   in {
