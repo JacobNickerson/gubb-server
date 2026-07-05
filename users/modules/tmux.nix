@@ -21,8 +21,6 @@
 			unbind '"'
 			unbind '%'
 
-			set-option -g destroy-unattached on
-
 			# Pane borders
 			set -g pane-border-style 'fg=colour4'
 			set -g pane-active-border-style 'fg=colour5'
