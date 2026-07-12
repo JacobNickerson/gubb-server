@@ -20,6 +20,10 @@
       enable = true;
       repo = "b2:gubb-server:/";
     };
+    sops-nix = {
+      enable = true;
+      defaultSopsFile = ./secrets;
+    };
   };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];

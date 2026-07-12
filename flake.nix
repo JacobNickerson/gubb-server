@@ -7,10 +7,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     vscode-server.url = "github:nix-community/nixos-vscode-server";
   };
 
-  outputs = { nixpkgs, home-manager, vscode-server, ... }@inputs:
+  outputs = { nixpkgs, home-manager, vscode-server, sops-nix, ... }@inputs:
   let
     system = "x86_64-linux";
 
@@ -34,6 +38,7 @@
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = { inherit inputs; hostname = hostname; };
           }
+          sops-nix.nixosModules.sops
           vscode-server.nixosModules.default
         ] ++ users;
       };  

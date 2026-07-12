@@ -7,6 +7,7 @@
     ./openssh.nix
     ./restic.nix
     ./samba.nix
+    ./sops-nix.nix
     ./wireguard.nix
   ];
 }
