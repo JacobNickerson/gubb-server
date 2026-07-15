@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 let
   cfg = config.myModules.home-assistant;
 in
@@ -20,11 +20,16 @@ in
         # Recommended for fast zlib compression
         # https://www.home-assistant.io/integrations/isal
         "isal"
+        "mqtt"
+      ];
+      customComponents = [
+        pkgs.home-assistant-custom-components.frigate
       ];
       config = {
         # Includes dependencies for a basic setup
         # https://www.home-assistant.io/integrations/default_config/
         default_config = {};
+        mqtt = {};
       };
     };
 

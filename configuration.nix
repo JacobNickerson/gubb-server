@@ -24,6 +24,8 @@
       enable = true;
       defaultSopsFile = ./secrets;
     };
+    frigate.enable = true;
+    mosquitto.enable = true;
   };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
