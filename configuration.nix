@@ -6,6 +6,10 @@
   ];
 
   myModules = {
+    duck-dns = {
+      enable = true;
+      domain = "shui-nails";
+    };
     home-assistant.enable = true;
     immich.enable = true;
     limine.enable = true;

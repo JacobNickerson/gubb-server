@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ./duck-dns.nix
     ./frigate.nix
     ./home-assistant.nix
     ./immich.nix
