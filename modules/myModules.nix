@@ -5,6 +5,7 @@
     ./frigate.nix
     ./home-assistant.nix
     ./immich.nix
+    ./kavita.nix
     ./limine.nix
     ./mosquitto.nix
     ./openssh.nix

@@ -12,6 +12,12 @@
     };
     home-assistant.enable = true;
     immich.enable = true;
+    kavita = {
+      enable = true;
+      port = 42467;
+      create-library = "/srv/nas/kavita";
+      allow-nas = true;
+    };
     limine.enable = true;
     openssh.enable = true;
     samba.enable = true;
