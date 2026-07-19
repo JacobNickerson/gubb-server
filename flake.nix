@@ -2,21 +2,27 @@
   description = "GubbServer Configuration";
 
   inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
     	url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    jake-flake = {
+      url = "github:jacobnickerson/nix-config";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     vscode-server.url = "github:nix-community/nixos-vscode-server";
+
     # NOTE: Temporary overlay, until this lands in nixpkgs-unstable
     frigate-fix.url = "github:NixOS/nixpkgs/00d642560bd1d2daf9939eb710c552d5dcddd737";
   };
 
-  outputs = { nixpkgs, home-manager, vscode-server, sops-nix, frigate-fix, ... }@inputs:
+  outputs = { nixpkgs, home-manager, vscode-server, sops-nix, frigate-fix, jake-flake, ... }@inputs:
   let
     system = "x86_64-linux";
 
@@ -43,6 +49,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = { inherit inputs; hostname = hostname; };
+            home-manager.sharedModules = [ jake-flake.homeModules.default ];
           }
           sops-nix.nixosModules.sops
           vscode-server.nixosModules.default

@@ -2,26 +2,23 @@
   user_name = "jacobnickerson";
 	home_dir = "/home/${user_name}";
   flake_path = "${home_dir}/gubb-server";
-	imports = [
-		./modules/git.nix
-		./modules/neovim.nix
-		(import ./modules/nix-helper.nix { flake_path = flake_path; })
-		./modules/tmux.nix
-		./modules/zsh.nix
-	];
 in {
 	config.users.users.jacobnickerson = {
 		isNormalUser = true;
 		description = "Jacob Nickerson";
 		extraGroups = [ "networkmanager" "wheel" "smb" ];
-		shell = pkgs.zsh;
-		ignoreShellProgramCheck = true; # NOTE: Silences a warning about shell not being enabled
+		shell = pkgs.fish;
 		packages = with pkgs; [];
 	};
 	config.home-manager.users.jacobnickerson = {
-		inherit imports;
 		fonts.fontconfig.enable = true;
-
+		myUserModules = {
+			fish.enable = true;
+			git.enable = true;
+			neovim.enable = true;
+			nix-helper.enable = true;
+			tmux.enable = true;
+		};
 		home = {
 			username = user_name;
 			homeDirectory = home_dir;
@@ -43,8 +40,8 @@ in {
 				lt   = "eza -aT --color=always --group-directories-first --icons";
 				lg   = "eza -alg --color=always --group-directories-first --icons";
 				ldot = "eza -a | grep -e '^\\.'";
-				dev         = "nix develop --command zsh";
-				tmp         = "nix-shell --command zsh -p";
+				dev         = "nix develop --command $SHELL";
+				tmp         = "nix-shell --command $SHELL -p";
 				tarnow      = "tar -acf ";
 				untar       = "tar -zxvf ";
 				wget        = "wget -c ";
