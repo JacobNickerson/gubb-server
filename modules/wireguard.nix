@@ -57,10 +57,6 @@ in
       matchConfig.Name = cfg.int_interface;
 
       address = [ "${cfg.subnet_prefix}.1/24" ];
-
-      networkConfig = {
-        #DNS = "${cfg.subnet_prefix}.1"; TODO: enable if setting up DNS resolver
-      };
     };
 
     systemd.tmpfiles.rules = [
@@ -100,11 +96,13 @@ in
           PublicKey = "h4WOuljd3KTSWDJ6bWISmJhi46FWAqO+LvD4sPgUkHc=";
           AllowedIPs = [ "${cfg.subnet_prefix}.5/32" ];
         }
+        { # BunTop
+          PublicKey = "+ENI1SFf02yH04jWmIwnVcMVYywkOkTbvggKa0MrkQE=";
+          AllowedIPs = [ "${cfg.subnet_prefix}.6/32" ];
+        }
       ];
     };
 
-    # TODO: enable this if setting up some type of dns resolver
-    # services.resolved.enable = true;
     environment.systemPackages = with pkgs; [
       wireguard-tools
     ];
