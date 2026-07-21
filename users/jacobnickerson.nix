@@ -1,7 +1,6 @@
 { inputs, config, pkgs, ... }: let
   user_name = "jacobnickerson";
 	home_dir = "/home/${user_name}";
-  flake_path = "${home_dir}/gubb-server";
 in {
 	config.users.users.jacobnickerson = {
 		isNormalUser = true;
@@ -17,6 +16,7 @@ in {
 			git.enable = true;
 			neovim.enable = true;
 			nix-helper.enable = true;
+			nix-helper.flake_path = "${home_dir}/gubb-server";
 			tmux.enable = true;
 		};
 		home = {
