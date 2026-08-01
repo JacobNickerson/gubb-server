@@ -6,12 +6,19 @@
   ];
 
   myModules = {
+    domain = "gubb.arpa";
+    server_address = "192.168.5.33";
+
+    dnsmasq.enable = true;
     duck-dns = {
       enable = true;
       domain = "shui-nails";
     };
     home-assistant.enable = true;
-    immich.enable = true;
+    immich = {
+      enable = true;
+      port = 42267;
+    };
     kavita = {
       enable = true;
       port = 42467;
@@ -19,12 +26,17 @@
       allow-nas = true;
     };
     limine.enable = true;
+    nginx.enable = true;
     openssh.enable = true;
     samba.enable = true;
     wireguard = {
       enable = true;
       ext_interface = "enp3s0f4u2";
       subnet_prefix = "10.100.0";
+    };
+    radicale = {
+      enable = true;
+      port = 5232;
     };
     restic = {
       enable = true;
