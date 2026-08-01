@@ -17,23 +17,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     vscode-server.url = "github:nix-community/nixos-vscode-server";
-
-    # NOTE: Temporary overlay, until this lands in nixpkgs-unstable
-    frigate-fix.url = "github:NixOS/nixpkgs/00d642560bd1d2daf9939eb710c552d5dcddd737";
   };
 
-  outputs = { nixpkgs, home-manager, vscode-server, sops-nix, frigate-fix, jake-flake, ... }@inputs:
+  outputs = { nixpkgs, home-manager, vscode-server, sops-nix, jake-flake, ... }@inputs:
   let
     system = "x86_64-linux";
-
-    frigate-overlay = final: prev: {
-      frigate = frigate-fix.legacyPackages.${system}.frigate;
-    };
 
     pkgs = import nixpkgs {
       inherit system;
       config.allowUnfree = true;
-      overlays = [ frigate-overlay ];
+      overlays = [ ];
     };
 
     mkHost = { hostname, config, hostConfig, users ? [] }:
