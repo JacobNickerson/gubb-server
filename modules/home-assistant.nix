@@ -39,18 +39,9 @@ in
       openFirewall = true;
     };
 
-    services.dnsmasq.settings.address = lib.mkAfter [
-      "/home-assistant.${config.myModules.domain}/${config.myModules.server_address}"
-    ];
-
-    services.nginx.virtualHosts = {
-      "home-assistant.${config.myModules.domain}" = {
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString port}";
-          recommendedProxySettings = true;
-          proxyWebsockets = true;
-        };
-      };
+    myModules.proxy.services.home-assistant = {
+      port = port;
+      proxyWebsockets = true;
     };
   };
 }

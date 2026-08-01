@@ -24,19 +24,11 @@ in
       "d ${uploadDir} 0750 immich immich -"
     ];
 
-    services.dnsmasq.settings.address = lib.mkAfter [
-      "/immich.${config.myModules.domain}/${config.myModules.server_address}"
-    ];
-
-    services.nginx.virtualHosts = {
-      "immich.${config.myModules.domain}" = {
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString cfg.port}";
-          extraConfig = ''
-            client_max_body_size 0;
-          '';
-        };
-      };
+    myModules.proxy.services.immich = {
+      port = cfg.port;
+      extraConfig = ''
+        client_max_body_size 0;
+      '';
     };
 
     services.immich = {

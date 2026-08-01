@@ -9,7 +9,6 @@
     domain = "gubb.arpa";
     server_address = "192.168.5.33";
 
-    dnsmasq.enable = true;
     duck-dns = {
       enable = true;
       domain = "shui-nails";
@@ -26,8 +25,8 @@
       allow-nas = true;
     };
     limine.enable = true;
-    nginx.enable = true;
     openssh.enable = true;
+    proxy.enable = true;
     samba.enable = true;
     wireguard = {
       enable = true;

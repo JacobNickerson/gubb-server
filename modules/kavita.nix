@@ -56,16 +56,8 @@ in
       };
     };
 
-    services.dnsmasq.settings.address = lib.mkAfter [
-      "/kavita.${config.myModules.domain}/${config.myModules.server_address}"
-    ];
-
-    services.nginx.virtualHosts = {
-      "kavita.${config.myModules.domain}" = {
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString cfg.port}";
-        };
-      };
+    myModules.proxy.services.kavita = {
+      port = cfg.port;
     };
 
     networking.firewall.allowedTCPPorts = [ cfg.port ];

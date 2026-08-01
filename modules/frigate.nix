@@ -178,17 +178,10 @@ in
     };
 
     networking.firewall.allowedTCPPorts = [ cfg.port ];
-    services.dnsmasq.settings.address = lib.mkAfter [
-      "/frigate.${config.myModules.domain}/${config.myModules.server_address}"
-    ];
-    services.nginx.virtualHosts = {
-      "frigate.${config.myModules.domain}" = {
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString cfg.port}";
-          recommendedProxySettings = true;
-          proxyWebsockets = true;
-        };
-      };
+
+    myModules.proxy.services.frigate = {
+      port = cfg.port;
+      proxyWebsockets = true;
     };
   };
 }

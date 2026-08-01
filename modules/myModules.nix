@@ -1,16 +1,15 @@
 { lib, ... }:
 {
   imports = [
-    ./dnsmasq.nix
     ./duck-dns.nix
     ./frigate.nix
     ./home-assistant.nix
     ./immich.nix
     ./kavita.nix
     ./limine.nix
-    ./nginx.nix
     ./mosquitto.nix
     ./openssh.nix
+    ./proxy.nix
     ./radicale.nix
     ./restic.nix
     ./samba.nix

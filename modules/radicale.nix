@@ -41,16 +41,8 @@ in
       };
     };
 
-    services.dnsmasq.settings.address = lib.mkAfter [
-      "/radicale.${config.myModules.domain}/${config.myModules.server_address}"
-    ];
-
-    services.nginx.virtualHosts = {
-      "radicale.${config.myModules.domain}" = {
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString cfg.port}";
-        };
-      };
+    myModules.proxy.services.radicale = {
+      port = cfg.port;
     };
 
     networking.firewall.allowedTCPPorts = [ cfg.port ];
