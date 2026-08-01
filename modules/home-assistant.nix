@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 let
   cfg = config.myModules.home-assistant;
+  port = 8123;
 in
 {
   options.myModules.home-assistant = {
@@ -30,9 +31,26 @@ in
         # https://www.home-assistant.io/integrations/default_config/
         default_config = {};
         mqtt = {};
+        http = {
+          use_x_forwarded_for = true;
+          trusted_proxies = [ "127.0.0.1" ];
+        };
       };
+      openFirewall = true;
     };
 
-    networking.firewall.allowedTCPPorts = [ 8123 ];
+    services.dnsmasq.settings.address = lib.mkAfter [
+      "/home-assistant.${config.myModules.domain}/${config.myModules.server_address}"
+    ];
+
+    services.nginx.virtualHosts = {
+      "home-assistant.${config.myModules.domain}" = {
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:${toString port}";
+          recommendedProxySettings = true;
+          proxyWebsockets = true;
+        };
+      };
+    };
   };
 }

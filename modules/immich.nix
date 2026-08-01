@@ -1,5 +1,4 @@
 { config, pkgs, lib, ... }:
-
 let
   cfg = config.myModules.immich;
   dataDir = "/srv/immich";
@@ -11,6 +10,12 @@ in
 {
   options.myModules.immich = {
     enable = lib.mkEnableOption "Immich server";
+
+    port = lib.mkOption {
+      type = lib.types.int;
+      default = 42267;
+      description = "Port for the Immich server";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -19,14 +24,29 @@ in
       "d ${uploadDir} 0750 immich immich -"
     ];
 
+    services.dnsmasq.settings.address = lib.mkAfter [
+      "/immich.${config.myModules.domain}/${config.myModules.server_address}"
+    ];
+
+    services.nginx.virtualHosts = {
+      "immich.${config.myModules.domain}" = {
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:${toString cfg.port}";
+          extraConfig = ''
+            client_max_body_size 0;
+          '';
+        };
+      };
+    };
+
     services.immich = {
       enable = true;
 
       user = "immich";
       group = "immich";
 
-      port = 42267;
-      host = "0.0.0.0";
+      port = cfg.port;
+      host = "127.0.0.1";
       openFirewall = true;
 
       mediaLocation = uploadDir;
@@ -35,7 +55,7 @@ in
 
       redis.enable = true;
 
-      database = {
+      database = {      # Recommended defaults
         enable = true;
         createDB = true;
         name = dbName;
