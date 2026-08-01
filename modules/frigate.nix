@@ -1,18 +1,43 @@
 { config, lib, pkgs, ... }:
 let
   cfg = config.myModules.frigate;
-  dataDir = "/srv/frigate";
+  frigateDir = "/srv/frigate";
+  dataDir = "${frigateDir}/data";
+  configDir = "${frigateDir}/config";
   hostname = "localhost";
   secret = config.sops.placeholder;
 
-  frigateSettings = {
-    database.path = "${dataDir}/frigate.db";
+  frigateConfig = pkgs.formats.yaml { };
 
+  frigateSettings = {
     mqtt = {
       enabled = true;
-      host = "192.168.5.33";
+      host = config.myModules.server_address;
       user = "frigate";
-      password = "{FRIGATE_MQTT_PASS}";
+      password = "\${FRIGATE_MQTT_PASS}";
+    };
+
+    # NOTE: go2rtc expands env variables with different syntax than frigate, note the lack of `$` 
+    go2rtc = {
+      streams = {
+        a_cam = [
+          "rtsp://{FRIGATE_A_USER}:{FRIGATE_A_PASS}@192.168.7.1:554/stream1"
+          "ffmpeg:a_cam#audio=aac"
+        ];
+        a_cam_alt = [
+          "rtsp://{FRIGATE_A_USER}:{FRIGATE_A_PASS}@192.168.7.1:554/stream2"
+          "ffmpeg:a_cam_alt#audio=aac"
+        ];
+
+        z_cam = [
+          "rtsp://{FRIGATE_Z_USER}:{FRIGATE_Z_PASS}@192.168.7.2:554/stream1"
+          "ffmpeg:z_cam#audio=aac"
+        ];
+        z_cam_alt = [
+          "rtsp://{FRIGATE_Z_USER}:{FRIGATE_Z_PASS}@192.168.7.2:554/stream2"
+          "ffmpeg:z_cam_alt#audio=aac"
+        ];
+      };
     };
 
     cameras = {
@@ -24,8 +49,8 @@ let
             roles = [ "record" "audio" ];
           }
           {
-            path = "rtsp://{FRIGATE_A_USER}:{FRIGATE_A_PASS}@192.168.7.1:554/stream2";
-            input_args = "preset-rtsp-generic";
+            path = "rtsp://127.0.0.1:8554/a_cam_alt";
+            input_args = "preset-rtsp-restream";
             roles = [ "detect" ];
           }
         ];
@@ -33,8 +58,8 @@ let
         onvif = {
           host = "192.168.7.1";
           port = 2020;
-          user = "{FRIGATE_A_USER}";
-          password = "{FRIGATE_A_PASS}";
+          user = "\${FRIGATE_A_USER}";
+          password = "\${FRIGATE_A_PASS}";
         };
 
         detect = {
@@ -43,6 +68,7 @@ let
           fps = 5;
         };
 
+        audio.enabled = true;
         record.enabled = false;
         snapshots.enabled = true;
       };
@@ -55,8 +81,8 @@ let
             roles = [ "record" "audio" ];
           }
           {
-            path = "rtsp://{FRIGATE_Z_USER}:{FRIGATE_Z_PASS}@192.168.7.2:554/stream2";
-            input_args = "preset-rtsp-generic";
+            path = "rtsp://127.0.0.1:8554/z_cam_alt";
+            input_args = "preset-rtsp-restream";
             roles = [ "detect" ];
           }
         ];
@@ -64,8 +90,8 @@ let
         onvif = {
           host = "192.168.7.2";
           port = 2020;
-          user = "{FRIGATE_Z_USER}";
-          password = "{FRIGATE_Z_PASS}";
+          user = "\${FRIGATE_Z_USER}";
+          password = "\${FRIGATE_Z_PASS}";
         };
 
         detect = {
@@ -74,33 +100,37 @@ let
           fps = 5;
         };
 
+        audio.enabled = true;
         record.enabled = false;
         snapshots.enabled = true;
       };
-    };
-  };
-
-  go2rtcSettings = {
-    streams = {
-      a_cam = [
-        "rtsp://\${FRIGATE_A_USER}:\${FRIGATE_A_PASS}@192.168.7.1:554/stream1"
-      ];
-
-      z_cam = [
-        "rtsp://\${FRIGATE_Z_USER}:\${FRIGATE_Z_PASS}@192.168.7.2:554/stream1"
-      ];
     };
   };
 in
 {
   options.myModules.frigate = {
     enable = lib.mkEnableOption "Frigate NVR";
+
+    port = lib.mkOption {
+      type = lib.types.int;
+      default = 5000;
+      description = "Port for the Frigate web interface";
+    };
   };
 
   config = lib.mkIf cfg.enable {
+    users.users.frigate = {
+      isSystemUser = true;
+      group = "frigate";
+    };
+    users.groups.frigate = {};
     systemd.tmpfiles.rules = [
+      "d ${frigateDir} 0750 frigate frigate -"
       "d ${dataDir} 0750 frigate frigate -"
+      "d ${configDir} 0750 frigate frigate -"
     ];
+
+    environment.etc."frigate/config.yml".source = frigateConfig.generate "frigate.yml" frigateSettings;
 
     sops.secrets."frigate/a_user" = {};
     sops.secrets."frigate/a_pass" = {};
@@ -110,55 +140,54 @@ in
 
     sops.templates."frigate.env" = {
       content = ''
-        FRIGATE_A_USER="${secret."frigate/a_user"}"
-        FRIGATE_A_PASS="${secret."frigate/a_pass"}"
-        FRIGATE_Z_USER="${secret."frigate/z_user"}"
-        FRIGATE_Z_PASS="${secret."frigate/z_pass"}"
-        FRIGATE_MQTT_PASS="${secret."frigate/mqtt_pass"}"
+        FRIGATE_A_USER=${secret."frigate/a_user"}
+        FRIGATE_A_PASS=${secret."frigate/a_pass"}
+        FRIGATE_Z_USER=${secret."frigate/z_user"}
+        FRIGATE_Z_PASS=${secret."frigate/z_pass"}
+        FRIGATE_MQTT_PASS=${secret."frigate/mqtt_pass"}
       '';
       mode = "0400";
-      restartUnits = [
-        "frigate.service"
-        "go2rtc.service"
+    };
+
+    virtualisation.oci-containers.containers.frigate = {
+      image = "ghcr.io/blakeblackshear/frigate:stable";
+
+      ports = [
+        "${toString cfg.port}:5000"
+        # "8554:8554"
+        # "8555:8555/tcp"
+        # "8555:8555/udp"
+      ];
+
+      volumes = [
+        "${configDir}:/config"
+        "${dataDir}:/media/frigate"
+        "/etc/localtime:/etc/localtime:ro"
+        "/etc/frigate/config.yml:/config/config.yml:ro"
+      ];
+
+      user = "${toString config.users.users.frigate.uid}:${toString config.users.groups.frigate.gid}";
+
+      environmentFiles = [
+        config.sops.templates."frigate.env".path
+      ];
+
+      extraOptions = [
+        "--shm-size=1024m"
       ];
     };
 
-    services.frigate = {
-      enable = true;
-      hostname = hostname;
-      checkConfig = false;
-      settings = frigateSettings;
-    };
-
-    services.go2rtc = {
-      enable = true;
-      settings = go2rtcSettings;
-    };
-
-    systemd.services.frigate = {
-      after = [ "sops-install-secrets.service" ];
-      wants = [ "sops-install-secrets.service" ];
-      serviceConfig.EnvironmentFile = config.sops.templates."frigate.env".path;
-    };
-
-    systemd.services.go2rtc = {
-      after = [ "sops-install-secrets.service" ];
-      wants = [ "sops-install-secrets.service" ];
-      serviceConfig.EnvironmentFile = config.sops.templates."frigate.env".path;
-    };
-
-    networking.firewall.allowedTCPPorts = [ 42367 ];
-    services.nginx.virtualHosts."frigate.lan" = {
-      listen = [
-        {
-          addr = "0.0.0.0";
-          port = 42367;
-        }
-      ];
-      forceSSL = false;
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:5000";
-        proxyWebsockets = true;
+    networking.firewall.allowedTCPPorts = [ cfg.port ];
+    services.dnsmasq.settings.address = lib.mkAfter [
+      "/frigate.${config.myModules.domain}/${config.myModules.server_address}"
+    ];
+    services.nginx.virtualHosts = {
+      "frigate.${config.myModules.domain}" = {
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:${toString cfg.port}";
+          recommendedProxySettings = true;
+          proxyWebsockets = true;
+        };
       };
     };
   };
