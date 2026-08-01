@@ -11,6 +11,7 @@
     ./nginx.nix
     ./mosquitto.nix
     ./openssh.nix
+    ./radicale.nix
     ./restic.nix
     ./samba.nix
     ./sops-nix.nix
