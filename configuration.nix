@@ -6,7 +6,7 @@
   ];
 
   myModules = {
-    domain = "gubb.arpa";
+    domain = "knitnet.org";
     server_address = "192.168.5.88";
 
     duck-dns = {
@@ -29,7 +29,10 @@
       enableSecureBoot = true;
     };
     openssh.enable = true;
-    proxy.enable = true;
+    proxy = {
+      enable = true;
+      enableACME = true;
+    };
     samba.enable = true;
     wireguard = {
       enable = true;

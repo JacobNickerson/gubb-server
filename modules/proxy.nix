@@ -30,14 +30,33 @@ in
 						'';
 					};
 				};
-      }));
-      default = {};
-      description = "Services that should be exposed via dnsmasq + nginx reverse proxy";
-    };
+			}));
+			default = {};
+			description = "Services that should be exposed via dnsmasq + nginx reverse proxy";
+		};
+
+		enableACME = lib.mkEnableOption "Enable automatic TLS certificate generation via ACME (Let's Encrypt)"; 
 	};
 
 	config = lib.mkIf cfg.enable {
 		services.resolved.enable = false; # Listens on the same port as dnsmasq
+
+		sops.secrets."cloudflare/dns_token" = lib.mkIf cfg.enableACME {};
+		sops.templates."cloudflare.env".content = lib.mkIf cfg.enableACME '' 
+			CLOUDFLARE_DNS_API_TOKEN=${config.sops.placeholder."cloudflare/dns_token"}
+		'';
+
+		security.acme = lib.mkIf cfg.enableACME { # TODO: Make this configurable
+			acceptTerms = true;
+			defaults.email = "jacobmilesnickerson@gmail.com";
+			certs."${config.myModules.domain}" = {
+				domain = "*.${config.myModules.domain}";
+				group = "nginx";
+				dnsProvider = "cloudflare";
+				dnsResolver = "1.1.1.1:53";
+				environmentFile = config.sops.templates."cloudflare.env".path;
+			};
+		};
 
 		services.dnsmasq = {
 			enable = true;
@@ -72,18 +91,18 @@ in
 			cfg.services
 		);
 
-    services.nginx.virtualHosts = lib.mapAttrs'
-      (name: svc: {
-        name = "${name}.${config.myModules.domain}";
-        value = {
-          locations."/" = {
-            proxyPass = "http://127.0.0.1:${toString svc.port}";
-            recommendedProxySettings = true;
-						proxyWebsockets = svc.proxyWebsockets;
-						extraConfig = svc.extraConfig;
-          };
-        };
-      })
-      cfg.services;
+		services.nginx.virtualHosts = lib.mapAttrs' (name: svc: {
+			name = "${name}.${config.myModules.domain}";
+			value = {
+				useACMEHost = if cfg.enableACME then config.myModules.domain else null;
+				forceSSL = cfg.enableACME;
+				locations."/" = {
+					proxyPass = "http://127.0.0.1:${toString svc.port}";
+					recommendedProxySettings = true;
+					proxyWebsockets = svc.proxyWebsockets;
+					extraConfig = svc.extraConfig;
+				};
+			};
+		}) cfg.services;
 	};
 }
