@@ -24,7 +24,10 @@
       create-library = "/srv/nas/kavita";
       allow-nas = true;
     };
-    limine.enable = true;
+    limine = {
+      enable = true;
+      enableSecureBoot = true;
+    };
     openssh.enable = true;
     proxy.enable = true;
     samba.enable = true;
