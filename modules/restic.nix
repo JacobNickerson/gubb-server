@@ -13,12 +13,20 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    sops.secrets."restic/passwd" = {};
+    sops.secrets."restic/account_id" = {};
+    sops.secrets."restic/account_key" = {};
+
+    sops.templates."restic.env".content = ''
+      B2_ACCOUNT_ID=${config.sops.placeholder."restic/account_id"}
+      B2_ACCOUNT_KEY=${config.sops.placeholder."restic/account_key"}
+    '';
+
     services.restic.backups.srv-backup = {
       initialize = true;
       repository = cfg.repo;
-      passwordFile = "/etc/restic-passwd";   # <passwd>
-      environmentFile = "/etc/restic-env";   # B2_ACCOUNT_ID=<keyid>
-                                             # B2_ACCOUNT_KEY=<appkey>
+      passwordFile = config.sops.secrets."restic/passwd".path;
+      environmentFile = config.sops.templates."restic.env".path; 
 
       paths = [ "/srv" ];
 
