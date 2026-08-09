@@ -67,10 +67,10 @@ in
 		networking.firewall.allowedUDPPorts = [ 53 ];
 
 		services.dnsmasq.settings.address = lib.mkAfter (
-      lib.mapAttrsToList
-        (name: svc: "/${name}.${config.myModules.domain}/${config.myModules.server_address}")
-        cfg.services
-    );
+			lib.mapAttrsToList
+			(name: svc: "/${name}.${config.myModules.domain}/${config.myModules.server_address}")
+			cfg.services
+		);
 
     services.nginx.virtualHosts = lib.mapAttrs'
       (name: svc: {
@@ -79,8 +79,8 @@ in
           locations."/" = {
             proxyPass = "http://127.0.0.1:${toString svc.port}";
             recommendedProxySettings = true;
-			proxyWebsockets = svc.proxyWebsockets;
-			extraConfig = svc.extraConfig;
+						proxyWebsockets = svc.proxyWebsockets;
+						extraConfig = svc.extraConfig;
           };
         };
       })
