@@ -2,7 +2,6 @@
 let
   cfg = config.myModules.wireguard;
   key_dir = "/etc/systemd/network/keys";
-  key_file = "${key_dir}/${cfg.int_interface}.key";
 in
 {
   options.myModules.wireguard = {
@@ -34,41 +33,23 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    systemd.tmpfiles.rules = [
+      "d ${key_dir} 0750 root systemd-network -"
+    ];
+    sops.secrets."wireguard/key" = {
+      owner = "root";
+      group = "systemd-network";
+      mode = "0640";
+    };
+
     networking.useNetworkd = true;
     networking.wireguard.enable = true;
-
-    boot.kernel.sysctl = {
-      "net.ipv4.ip_forward" = 1;
-      "net.ipv6.conf.all.forwarding" = 1;
-    };
-
-    networking.firewall = {
-      enable = true;
-      allowedUDPPorts = [ cfg.port ];
-    };
-
-    networking.nat = {
-      enable = true;
-      externalInterface = cfg.ext_interface;
-      internalInterfaces = [ cfg.int_interface ];
-    };
 
     systemd.network.networks."50-${cfg.int_interface}" = {
       matchConfig.Name = cfg.int_interface;
 
       address = [ "${cfg.subnet_prefix}.1/24" ];
     };
-
-    systemd.tmpfiles.rules = [
-      "d ${key_dir} 0750 root systemd-network -"
-    ];
-    system.activationScripts.wireguard-key = ''
-      if [ ! -f ${key_file} ]; then
-        ${pkgs.wireguard-tools}/bin/wg genkey > ${key_file}
-        chown root:systemd-network ${key_file}
-        chmod 640 ${key_file}
-      fi
-    '';
 
     systemd.network.netdevs."50-${cfg.int_interface}" = {
       netdevConfig = {
@@ -78,7 +59,7 @@ in
       };
 
       wireguardConfig = {
-        PrivateKeyFile = key_file;
+        PrivateKeyFile = config.sops.secrets."wireguard/key".path;
         ListenPort = cfg.port;
       };
 
@@ -101,6 +82,19 @@ in
           AllowedIPs = [ "${cfg.subnet_prefix}.6/32" ];
         }
       ];
+    };
+
+    boot.kernel.sysctl = {
+      "net.ipv4.ip_forward" = 1;
+      "net.ipv6.conf.all.forwarding" = 1;
+    };
+
+    networking.firewall.allowedUDPPorts = [ cfg.port ];
+
+    networking.nat = {
+      enable = true;
+      externalInterface = cfg.ext_interface;
+      internalInterfaces = [ cfg.int_interface ];
     };
 
     environment.systemPackages = with pkgs; [
