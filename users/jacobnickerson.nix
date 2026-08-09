@@ -34,11 +34,11 @@ in {
 			};
 
 			shellAliases = {
-				ls   = "eza -al --color=always --group-directories-first --icons";
-				la   = "eza -a --color=always --group-directories-first --icons";
-				ll   = "eza -l --color=always --group-directories-first --icons";
-				lt   = "eza -aT --color=always --group-directories-first --icons";
-				lg   = "eza -alg --color=always --group-directories-first --icons";
+				ls   = "eza -al ";
+				la   = "eza -a  ";
+				ll   = "eza -l  ";
+				lt   = "eza -aT ";
+				lg   = "eza -alg";
 				ldot = "eza -a | grep -e '^\\.'";
 				dev         = "nix develop --command $SHELL";
 				tmp         = "nix-shell --command $SHELL -p";
