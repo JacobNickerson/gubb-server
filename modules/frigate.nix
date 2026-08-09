@@ -14,28 +14,33 @@ let
       enabled = true;
       host = config.myModules.server_address;
       user = "frigate";
-      password = "\${FRIGATE_MQTT_PASS}";
+      password = "{FRIGATE_MQTT_PASS}";
     };
 
-    # NOTE: go2rtc expands env variables with different syntax than frigate, note the lack of `$` 
     go2rtc = {
       streams = {
         a_cam = [
           "rtsp://{FRIGATE_A_USER}:{FRIGATE_A_PASS}@192.168.7.1:554/stream1"
-          "ffmpeg:a_cam#audio=aac"
+          "ffmpeg:a_cam#af=volume=3.0"
         ];
         a_cam_alt = [
           "rtsp://{FRIGATE_A_USER}:{FRIGATE_A_PASS}@192.168.7.1:554/stream2"
-          "ffmpeg:a_cam_alt#audio=aac"
+          "ffmpeg:a_cam_alt#audio=aac#af=volume=3.0"
         ];
 
         z_cam = [
           "rtsp://{FRIGATE_Z_USER}:{FRIGATE_Z_PASS}@192.168.7.2:554/stream1"
-          "ffmpeg:z_cam#audio=aac"
+          "ffmpeg:z_cam#af=volume=3.0"
         ];
         z_cam_alt = [
           "rtsp://{FRIGATE_Z_USER}:{FRIGATE_Z_PASS}@192.168.7.2:554/stream2"
-          "ffmpeg:z_cam_alt#audio=aac"
+          "ffmpeg:z_cam_alt#audio=aac#af=volume=3.0"
+        ];
+      };
+      webrtc = {
+        candidates = [
+          "192.168.7.1:8555"
+          "192.168.7.2:8555"
         ];
       };
     };
@@ -58,8 +63,8 @@ let
         onvif = {
           host = "192.168.7.1";
           port = 2020;
-          user = "\${FRIGATE_A_USER}";
-          password = "\${FRIGATE_A_PASS}";
+          user = "{FRIGATE_A_USER}";
+          password = "{FRIGATE_A_PASS}";
         };
 
         detect = {
@@ -90,8 +95,8 @@ let
         onvif = {
           host = "192.168.7.2";
           port = 2020;
-          user = "\${FRIGATE_Z_USER}";
-          password = "\${FRIGATE_Z_PASS}";
+          user = "{FRIGATE_Z_USER}";
+          password = "{FRIGATE_Z_PASS}";
         };
 
         detect = {
@@ -154,9 +159,9 @@ in
 
       ports = [
         "${toString cfg.port}:5000"
-        # "8554:8554"
-        # "8555:8555/tcp"
-        # "8555:8555/udp"
+        "8554:8554"
+        "8555:8555/tcp"
+        "8555:8555/udp"
       ];
 
       volumes = [
