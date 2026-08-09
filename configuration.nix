@@ -7,7 +7,7 @@
 
   myModules = {
     domain = "gubb.arpa";
-    server_address = "192.168.5.33";
+    server_address = "192.168.5.88";
 
     duck-dns = {
       enable = true;
@@ -33,7 +33,7 @@
     samba.enable = true;
     wireguard = {
       enable = true;
-      ext_interface = "enp3s0f4u2";
+      ext_interface = "enp6s0";
       subnet_prefix = "10.100.0";
     };
     radicale = {
