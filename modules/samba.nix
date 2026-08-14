@@ -26,15 +26,19 @@ in
           "hosts deny" = "0.0.0.0/0";
           "guest account" = "nobody";
           "map to guest" = "bad user";
-          "min protocol" = "SMB2";
+          "min protocol" = "SMB3";
+          "smb3 unix extensions" = "yes";
         };
         "gubb-storage" = {
           "path" = "${smb_dir}";
           "browseable" = "yes";
           "read only" = "no";
           "guest ok" = "no";
+          "inherit permissions" = "yes";
           "create mask" = "0644";
           "directory mask" = "0755";
+          "force create mode" = "0000";
+          "force directory mode" = "0000";
           "valid users" = "@smb";
         };
       };
@@ -44,5 +48,10 @@ in
       enable = true;
       openFirewall = true;
     };
+
+    # NOTE: SAMBA does not use the usual proxy config because it doesn't use HTTP/S
+    services.dnsmasq.settings.address = lib.mkIf config.myModules.proxy.enable (lib.mkAfter [
+      "/nas.${config.myModules.domain}/${config.myModules.server_address}"
+    ]);
   };
 }
