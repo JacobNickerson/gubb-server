@@ -22,7 +22,7 @@ in {
 		home = {
 			username = user_name;
 			homeDirectory = home_dir;
-			stateVersion = "25.11"; 
+			stateVersion = "26.05"; 
 
 			packages = with pkgs; [
 				eza
