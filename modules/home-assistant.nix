@@ -31,13 +31,14 @@ in
         # https://www.home-assistant.io/integrations/default_config/
         default_config = {};
         mqtt = {};
-        http = {
-          use_x_forwarded_for = true;
-          trusted_proxies = [ "127.0.0.1" ];
-        };
+        #http = {
+        #  use_x_forwarded_for = true;
+        #  trusted_proxies = [ "127.0.0.1" ];
+        #};
       };
-      openFirewall = true;
     };
+    
+    networking.firewall.allowedTCPPorts = [ port ];
 
     myModules.proxy.services.home-assistant = {
       port = port;
