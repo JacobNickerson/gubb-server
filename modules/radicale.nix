@@ -21,6 +21,12 @@ in
       "d ${collectionDir} 0750 radicale radicale -"
     ];
 
+    sops.secrets.radicale = {
+      owner = "radicale";
+      group = "radicale";
+      mode = "0400";
+    };
+
     services.radicale = {
       enable = true;
 
@@ -30,9 +36,9 @@ in
         };
 
         auth = {
-          type = "none"; # TODO: Add proper auth
-          # htpasswd_filename = "${dataDir}/users";
-          # htpasswd_encryption = "bcrypt";
+          type = "htpasswd";
+          htpasswd_filename = config.sops.secrets.radicale.path;
+          htpasswd_encryption = "bcrypt";
         };
 
         storage = {
