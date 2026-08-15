@@ -7,6 +7,11 @@ in
   options.myModules.wireguard = {
     enable = lib.mkEnableOption "WireGuard server";
 
+    external_address = lib.mkOption {
+      type = lib.types.str;
+      description = "External network address to route VPN DNS entry to";
+    };
+
     port = lib.mkOption {
       type = lib.types.int;
       default = 42167;
@@ -89,13 +94,19 @@ in
       "net.ipv6.conf.all.forwarding" = 1;
     };
 
-    networking.firewall.allowedUDPPorts = [ cfg.port ];
-
     networking.nat = {
       enable = true;
       externalInterface = cfg.ext_interface;
       internalInterfaces = [ cfg.int_interface ];
     };
+
+    networking.firewall.allowedUDPPorts = [ cfg.port ];
+
+    # NOTE: WireGuard does not use the usual proxy config because it doesn't use HTTP/S
+    #       Additionally it routes to external IP because it broke the clients if it routes to local
+    services.dnsmasq.settings.address = lib.mkIf config.myModules.proxy.enable (lib.mkAfter [
+      "/vpn.${config.myModules.domain}/${cfg.external_address}"
+    ]);
 
     environment.systemPackages = with pkgs; [
       wireguard-tools
