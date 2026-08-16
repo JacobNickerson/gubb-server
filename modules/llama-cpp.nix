@@ -38,6 +38,7 @@ in
         host = "127.0.0.1";
         port = cfg.port;
         models-dir = cfg.model_dir;
+        sleep-idle-seconds = 300;
       };
       openFirewall = true;
       package = llama-pkg;
