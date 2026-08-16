@@ -8,6 +8,13 @@ in
     amdgpu.enable = lib.mkEnableOption "Enable AMD GPU drivers";
   };
   config = lib.mkMerge [
+    (lib.mkIf (cfg.nvidia.enable || cfg.amdgpu.enable) {
+      hardware.graphics = {
+        enable = true;
+        enable32Bit = true;
+      };
+    })
+    
     (lib.mkIf cfg.nvidia.enable {
       services.xserver.videoDrivers = lib.mkAfter [ "nvidia" ];
       hardware.nvidia = {

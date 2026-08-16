@@ -7,6 +7,7 @@
     ./home-assistant.nix
     ./immich.nix
     ./kavita.nix
+    ./llama-cpp.nix
     ./limine.nix
     ./mosquitto.nix
     ./openssh.nix

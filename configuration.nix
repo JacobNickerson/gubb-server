@@ -13,6 +13,7 @@
       enable = true;
       domain = "shui-nails";
     };
+    gpu.nvidia.enable = true;
     home-assistant.enable = true;
     immich = {
       enable = true;
@@ -23,6 +24,11 @@
       port = 42467;
       create-library = "/srv/nas/kavita";
       allow-nas = true;
+    };
+    llama-cpp = {
+      enable = true;
+      port = 42567;
+      model_dir = "/srv/llama/models";
     };
     limine = {
       enable = true;
@@ -47,6 +53,8 @@
     restic = {
       enable = true;
       repo = "b2:gubb-server:/";
+      paths = [ "/srv" ];
+      exclude = [ "/srv/llama" ];
     };
     sops-nix = {
       enable = true;
