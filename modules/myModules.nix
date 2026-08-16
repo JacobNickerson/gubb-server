@@ -3,6 +3,7 @@
   imports = [
     ./duck-dns.nix
     ./frigate.nix
+    ./gpu.nix
     ./home-assistant.nix
     ./immich.nix
     ./kavita.nix
