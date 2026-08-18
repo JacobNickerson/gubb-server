@@ -14,7 +14,10 @@ in {
 		myUserModules = {
 			fish.enable = true;
 			git.enable = true;
+			mcp.mcp-nixos.enable = true;
+			mcp.searxng.enable = true;
 			neovim.enable = true;
+			opencode.enable = true;
 			nix-helper.enable = true;
 			nix-helper.flake_path = "${home_dir}/gubb-server";
 			tmux.enable = true;
