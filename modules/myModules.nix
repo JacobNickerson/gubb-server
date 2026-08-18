@@ -7,8 +7,11 @@
     ./home-assistant.nix
     ./immich.nix
     ./kavita.nix
+    ./limine.nix
+    ./llama-cpp.nix
     ./mosquitto.nix
     ./openssh.nix
+    ./open-webui.nix
     ./proxy.nix
     ./radicale.nix
     ./restic.nix
