@@ -10,6 +10,18 @@ in
       type = lib.types.str;
       description = "Repository to store backups on";
     };
+
+    paths = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      description = "Paths to include in backup";
+    };
+
+    exclude = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      description = "Paths to explicitly exclude in backup";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -28,7 +40,8 @@ in
       passwordFile = config.sops.secrets."restic/passwd".path;
       environmentFile = config.sops.templates."restic.env".path; 
 
-      paths = [ "/srv" ];
+      paths = cfg.paths;
+      exclude = cfg.exclude;
 
       timerConfig = {
         OnCalendar = "daily";
