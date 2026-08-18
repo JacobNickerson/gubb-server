@@ -7,14 +7,13 @@
     ./home-assistant.nix
     ./immich.nix
     ./kavita.nix
-    ./llama-cpp.nix
-    ./limine.nix
     ./mosquitto.nix
     ./openssh.nix
     ./proxy.nix
     ./radicale.nix
     ./restic.nix
     ./samba.nix
+    ./searxng.nix
     ./sops-nix.nix
     ./wireguard.nix
   ];
