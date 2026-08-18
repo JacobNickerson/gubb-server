@@ -25,16 +25,20 @@
       create-library = "/srv/nas/kavita";
       allow-nas = true;
     };
+    limine = {
+      enable = true;
+      enableSecureBoot = true;
+    };
     llama-cpp = {
       enable = true;
       port = 42567;
       model_dir = "/srv/llama/models";
     };
-    limine = {
-      enable = true;
-      enableSecureBoot = true;
-    };
     openssh.enable = true;
+    open-webui = {
+      enable = true;
+      port = 42667;
+    };
     proxy = {
       enable = true;
       enableACME = true;
@@ -55,6 +59,10 @@
       repo = "b2:gubb-server:/";
       paths = [ "/srv" ];
       exclude = [ "/srv/llama" ];
+    };
+    searxng = {
+      enable = true;
+      port = 42767;
     };
     sops-nix = {
       enable = true;
