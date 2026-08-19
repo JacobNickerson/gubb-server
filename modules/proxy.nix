@@ -29,6 +29,19 @@ in
 							client_max_body_size 5000M;
 						'';
 					};
+					extra = lib.mkOption {
+						type = lib.types.attrs;
+						default = {};
+						description = ''
+							Extra configuration added to the nginx virtualHost.
+							Useful for things like defining additional routes.
+						'';
+						example = {
+							locations."/static/" = {
+								alias = "/var/lib/app/static/";
+							};
+						};
+					};
 				};
 			}));
 			default = {};
@@ -93,16 +106,19 @@ in
 
 		services.nginx.virtualHosts = lib.mapAttrs' (name: svc: {
 			name = "${name}.${config.myModules.domain}";
-			value = {
-				useACMEHost = if cfg.enableACME then config.myModules.domain else null;
-				forceSSL = cfg.enableACME;
-				locations."/" = {
-					proxyPass = "http://127.0.0.1:${toString svc.port}";
-					recommendedProxySettings = true;
-					proxyWebsockets = svc.proxyWebsockets;
-					extraConfig = svc.extraConfig;
-				};
-			};
+			value = lib.mkMerge [
+				{
+					useACMEHost = if cfg.enableACME then config.myModules.domain else null;
+					forceSSL = cfg.enableACME;
+					locations."/" = {
+						proxyPass = "http://127.0.0.1:${toString svc.port}";
+						recommendedProxySettings = true;
+						proxyWebsockets = svc.proxyWebsockets;
+						extraConfig = svc.extraConfig;
+					};
+				}
+				svc.extra
+			];
 		}) cfg.services;
 	};
 }
