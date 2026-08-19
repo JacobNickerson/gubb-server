@@ -9,6 +9,7 @@ in
 		services = lib.mkOption {
 			type = lib.types.attrsOf (lib.types.submodule ({ name, ... }: {
 				options = {
+					dontForceSSL = lib.mkEnableOption "Don't automatically redirect :80 traffic to :443";
 					port = lib.mkOption {
 						type = lib.types.port;
 						description = "Local port the service listens on";
@@ -47,7 +48,6 @@ in
 			default = {};
 			description = "Services that should be exposed via dnsmasq + nginx reverse proxy";
 		};
-
 		enableACME = lib.mkEnableOption "Enable automatic TLS certificate generation via ACME (Let's Encrypt)"; 
 	};
 
@@ -108,8 +108,9 @@ in
 			name = "${name}.${config.myModules.domain}";
 			value = lib.mkMerge [
 				{
+					serverName = "${name}.${config.myModules.domain}";
 					useACMEHost = if cfg.enableACME then config.myModules.domain else null;
-					forceSSL = cfg.enableACME;
+					forceSSL = !svc.dontForceSSL;
 					locations."/" = {
 						proxyPass = "http://127.0.0.1:${toString svc.port}";
 						recommendedProxySettings = true;
