@@ -68,6 +68,18 @@ in
       mode = "0400";
     };
 
+    sops.secrets."shui/cloudflare_token" = {};
+    sops.secrets."shui/tunnel_id" = {};
+    sops.secrets."shui/account_id" = {};
+    sops.templates."shui-cloudflare.json" = {
+      content = builtins.toJSON {
+        AccountTag = config.sops.placeholder."shui/account_id";
+        TunnelSecret = config.sops.placeholder."shui/cloudflare_token";
+        TunnelID = config.sops.placeholder."shui/tunnel_id";
+        Endpoint = "";
+      };
+    };
+
     systemd.services.shui-migrate = {
       description = "Run Django migrations and collect static files";
       wantedBy = [ "multi-user.target" ];
@@ -129,6 +141,7 @@ in
 
     myModules.proxy.services.shui = {
       port = cfg.port;
+      dontForceSSL = true;
       extra = {
         locations."/static/" = {
           alias = "${stateDir}/staticfiles/";
@@ -136,6 +149,18 @@ in
         locations."/media/" = {
           alias = "${cfg.dataDir}/media/";
         };
+      };
+    };
+
+    services.cloudflared = {
+      enable = true;
+      tunnels."shui-tunnel" = {
+        credentialsFile = config.sops.templates."shui-cloudflare.json".path;
+        default = "http_status:404";
+        ingress = {
+          "shui.knitnet.org" = "http://localhost:80";
+        };
+        originRequest.httpHostHeader = "shui.knitnet.org";
       };
     };
   };
