@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 let
   cfg = config.myModules.shui;
-  version = "0.1.0";
+  version = "0.1.1";
   shui-deps = [
     pkgs.python3Packages.django
     pkgs.python3Packages.python-dotenv
@@ -23,7 +23,7 @@ let
       owner = "JacobNickerson";
       repo = "shui";
       rev = "v${version}";
-      hash = "sha256-kFRGFhglkfMBea3SuGnZbnTMFsQBsLWcwgVL+Jlos/0=";
+      hash = "sha256-nF0wFntGvFybBh8bD+Ux5hifA8XzbG9xe4FW3p8mKmE=";
     };
   };
   pythonEnv = pkgs.python3.withPackages (ps: [ shui-pkg ] ++ shui-deps);
