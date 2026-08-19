@@ -17,6 +17,7 @@
     ./restic.nix
     ./samba.nix
     ./searxng.nix
+    ./shui.nix
     ./sops-nix.nix
     ./wireguard.nix
   ];

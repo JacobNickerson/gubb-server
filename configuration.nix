@@ -65,6 +65,12 @@
       enable = true;
       port = 42767;
     };
+    shui = {
+      enable = true;
+      port = 42867;
+      dataDir = "/srv/shui";
+      allowedHosts = "shui.knitnet.org";
+    };
     sops-nix = {
       enable = true;
       defaultSopsFile = ./secrets;
