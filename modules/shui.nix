@@ -69,13 +69,13 @@ in
     };
 
     sops.secrets."shui/cloudflare_token" = {};
-    sops.secrets."shui/tunnel_id" = {};
-    sops.secrets."shui/account_id" = {};
+    sops.secrets."shui/cloudflare_tunnel_id" = {};
+    sops.secrets."shui/cloudflare_account_id" = {};
     sops.templates."shui-cloudflare.json" = {
       content = builtins.toJSON {
-        AccountTag = config.sops.placeholder."shui/account_id";
+        AccountTag = config.sops.placeholder."shui/cloudflare_account_id";
         TunnelSecret = config.sops.placeholder."shui/cloudflare_token";
-        TunnelID = config.sops.placeholder."shui/tunnel_id";
+        TunnelID = config.sops.placeholder."shui/cloudflare_tunnel_id";
         Endpoint = "";
       };
     };
