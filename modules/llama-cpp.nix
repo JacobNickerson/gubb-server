@@ -50,6 +50,11 @@ in
 
     myModules.proxy.services.llama = {
       port = cfg.port;
+      dns.enable = true;
+      nginx = {
+        enable = true;
+        enableACME = true;
+      };
     };
   };
 }

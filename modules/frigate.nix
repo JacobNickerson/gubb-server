@@ -186,7 +186,12 @@ in
 
     myModules.proxy.services.frigate = {
       port = cfg.port;
-      proxyWebsockets = true;
+      dns.enable = true;
+      nginx = {
+        enable = true;
+        enableACME = true;
+        proxyWebsockets = true;
+      };
     };
   };
 }

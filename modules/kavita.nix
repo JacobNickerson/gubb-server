@@ -58,6 +58,11 @@ in
 
     myModules.proxy.services.kavita = {
       port = cfg.port;
+      dns.enable = true;
+      nginx = {
+        enable = true;
+        enableACME = true;
+      };
     };
 
     networking.firewall.allowedTCPPorts = [ cfg.port ];

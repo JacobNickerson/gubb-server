@@ -49,6 +49,11 @@ in
 
     myModules.proxy.services.radicale = {
       port = cfg.port;
+      dns.enable = true;
+      nginx = {
+        enable = true;
+        enableACME = true;
+      };
     };
 
     networking.firewall.allowedTCPPorts = [ cfg.port ];

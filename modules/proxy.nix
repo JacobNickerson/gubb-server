@@ -1,47 +1,68 @@
 { config, lib, pkgs, ... }:
 let
   cfg = config.myModules.proxy;
+
+	use_acme = builtins.any (x: x.nginx.enableACME) (builtins.attrValues cfg.services);
 in
 {
 	options.myModules.proxy = {
-		enable = lib.mkEnableOption "DNS + Reverse proxy services";
+		enable = lib.mkEnableOption "DNS, nginx reverse-proxy, and cloudflare tunnel helpers";
 
 		services = lib.mkOption {
 			type = lib.types.attrsOf (lib.types.submodule ({ name, ... }: {
 				options = {
-					dontForceSSL = lib.mkEnableOption "Don't automatically redirect :80 traffic to :443";
 					port = lib.mkOption {
 						type = lib.types.port;
 						description = "Local port the service listens on";
 					};
-					proxyWebsockets = lib.mkOption {
-						type = lib.types.bool;
-						default = false;
-						description = "Enable WebSocket proxying (proxy_http_version 1.1 + Upgrade headers)";
-					};
-					extraConfig = lib.mkOption {
-						type = lib.types.lines;
-						default = "";
-						description = ''
-							Extra configuration lines added to the nginx virtualHost.
-							Useful for things like client_max_body_size, timeouts, etc.
-						'';
-						example = ''
-							client_max_body_size 5000M;
-						'';
-					};
-					extra = lib.mkOption {
-						type = lib.types.attrs;
-						default = {};
-						description = ''
-							Extra configuration added to the nginx virtualHost.
-							Useful for things like defining additional routes.
-						'';
-						example = {
-							locations."/static/" = {
-								alias = "/var/lib/app/static/";
+					dns = lib.mkOption {
+						type = lib.types.submodule {
+							options = {
+								enable = lib.mkEnableOption "Add a DNS entry for this service";
 							};
 						};
+						default = {};
+						description = "";
+					};
+					nginx = lib.mkOption {
+						type = lib.types.submodule {
+							options = {
+								enable = lib.mkEnableOption "Setup nginx reverse-proxying to this service";
+								enableACME = lib.mkEnableOption "Enable automatic TLS certificate generation via ACME (Let's Encrypt)"; 
+								dontForceSSL = lib.mkEnableOption "Don't automatically redirect :80 traffic to :443";
+								proxyWebsockets = lib.mkOption {
+									type = lib.types.bool;
+									default = false;
+									description = "Enable WebSocket proxying (proxy_http_version 1.1 + Upgrade headers)";
+								};
+								extraConfig = lib.mkOption {
+									type = lib.types.lines;
+									default = "";
+									description = ''
+										Extra configuration lines added to the nginx virtualHost.
+										Useful for things like client_max_body_size, timeouts, etc.
+									'';
+									example = ''
+										client_max_body_size 5000M;
+									'';
+								};
+								extra = lib.mkOption {
+									type = lib.types.attrs;
+									default = {};
+									description = ''
+										Extra configuration added to the nginx virtualHost.
+										Useful for things like defining additional routes.
+									'';
+									example = {
+										locations."/static/" = {
+											alias = "/var/lib/app/static/";
+										};
+									};
+								};
+							};
+						};
+						default = {};
+						description = "";
 					};
 					cloudflare_tunnel = lib.mkOption {
 						type = lib.types.submodule {
@@ -81,7 +102,6 @@ in
 			default = {};
 			description = "Services that should be exposed via dnsmasq + nginx reverse proxy";
 		};
-		enableACME = lib.mkEnableOption "Enable automatic TLS certificate generation via ACME (Let's Encrypt)"; 
 	};
 
 	config = lib.mkIf cfg.enable {
@@ -93,12 +113,12 @@ in
 
 		services.resolved.enable = false; # Listens on the same port as dnsmasq
 
-		sops.secrets."cloudflare/dns_token" = lib.mkIf cfg.enableACME {};
-		sops.templates."cloudflare.env".content = lib.mkIf cfg.enableACME '' 
+		sops.secrets."cloudflare/dns_token" = lib.mkIf use_acme {};
+		sops.templates."cloudflare.env".content = lib.mkIf use_acme '' 
 			CLOUDFLARE_DNS_API_TOKEN=${config.sops.placeholder."cloudflare/dns_token"}
 		'';
 
-		security.acme = lib.mkIf cfg.enableACME { # TODO: Make this configurable
+		security.acme = lib.mkIf use_acme { # TODO: Make this configurable
 			acceptTerms = true;
 			defaults.email = "jacobmilesnickerson@gmail.com";
 			certs."${config.myModules.domain}" = {
@@ -143,7 +163,7 @@ in
 
 		services.dnsmasq.settings.address = lib.mkAfter (
 			lib.mapAttrsToList
-			(name: svc: "/${name}.${config.myModules.domain}/${config.myModules.server_address}")
+			(name: _svc: "/${name}.${config.myModules.domain}/${config.myModules.server_address}")
 			cfg.services
 		);
 
@@ -152,16 +172,16 @@ in
 			value = lib.mkMerge [
 				{
 					serverName = "${name}.${config.myModules.domain}";
-					useACMEHost = if cfg.enableACME then config.myModules.domain else null;
-					forceSSL = !svc.dontForceSSL;
+					useACMEHost = if svc.nginx.enableACME then config.myModules.domain else null;
+					forceSSL = !svc.nginx.dontForceSSL;
 					locations."/" = {
 						proxyPass = "http://127.0.0.1:${toString svc.port}";
 						recommendedProxySettings = true;
-						proxyWebsockets = svc.proxyWebsockets;
-						extraConfig = svc.extraConfig;
+						proxyWebsockets = svc.nginx.proxyWebsockets;
+						extraConfig = svc.nginx.extraConfig;
 					};
 				}
-				svc.extra
+				svc.nginx.extra
 			];
 		}) cfg.services;
 

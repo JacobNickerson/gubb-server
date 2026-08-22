@@ -26,9 +26,15 @@ in
 
     myModules.proxy.services.immich = {
       port = cfg.port;
-      extraConfig = ''
-        client_max_body_size 0;
-      '';
+      dns.enable = true;
+      nginx = {
+        enable = true;
+        enableACME = true;
+        proxyWebsockets = true;
+        extraConfig = ''
+          client_max_body_size 0;
+        '';
+      };
     };
 
     services.immich = {

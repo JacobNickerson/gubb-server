@@ -42,7 +42,6 @@
     };
     proxy = {
       enable = true;
-      enableACME = true;
     };
     samba.enable = true;
     wireguard = {

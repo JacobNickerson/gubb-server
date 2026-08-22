@@ -141,13 +141,17 @@ in
 
     myModules.proxy.services.shui = {
       port = cfg.port;
-      dontForceSSL = true;
-      extra = {
-        locations."/static/" = {
-          alias = "${stateDir}/staticfiles/";
-        };
-        locations."/media/" = {
-          alias = "${cfg.dataDir}/media/";
+      dns.enable = true;
+      nginx = {
+        enable = true;
+        dontForceSSL = true;
+        extra = {
+          locations."/static/" = {
+            alias = "${stateDir}/staticfiles/";
+          };
+          locations."/media/" = {
+            alias = "${cfg.dataDir}/media/";
+          };
         };
       };
       cloudflare_tunnel = {

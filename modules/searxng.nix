@@ -67,6 +67,11 @@ in
 
     myModules.proxy.services.searxng = {
       port = cfg.port;
+      dns.enable = true;
+      nginx = {
+        enable = true;
+        enableACME = true;
+      };
     };
   };
 }

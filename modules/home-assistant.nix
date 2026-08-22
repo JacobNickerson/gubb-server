@@ -42,7 +42,12 @@ in
 
     myModules.proxy.services.home-assistant = {
       port = port;
-      proxyWebsockets = true;
+      dns.enable = true;
+      nginx = {
+        enable = true;
+        enableACME = true;
+        proxyWebsockets = true;
+      };
     };
   };
 }

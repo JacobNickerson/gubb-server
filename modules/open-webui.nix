@@ -23,7 +23,12 @@ in
 
     myModules.proxy.services.open-webui = {
       port = cfg.port;
-      proxyWebsockets = true;
+      dns.enable = true;
+      nginx = {
+        enable = true;
+        enableACME = true;
+        proxyWebsockets = true;
+      };
     };
   };
 }
