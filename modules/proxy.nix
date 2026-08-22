@@ -157,6 +157,9 @@ in
 		services.cloudflared = {
 			enable = true;
 		};
+		environment.systemPackages = with pkgs; [
+			cloudflared
+		];
 
 		networking.firewall.allowedTCPPorts = [ 80 443 ];
 		networking.firewall.allowedUDPPorts = [ 53 ];
