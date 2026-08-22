@@ -150,17 +150,10 @@ in
           alias = "${cfg.dataDir}/media/";
         };
       };
-    };
-
-    services.cloudflared = {
-      enable = true;
-      tunnels."shui-tunnel" = {
+      cloudflare_tunnel = {
+        enable = true;
+        useHttpBoilerplate = true;
         credentialsFile = config.sops.templates."shui-cloudflare.json".path;
-        default = "http_status:404";
-        ingress = {
-          "shui.knitnet.org" = "http://localhost:80";
-        };
-        originRequest.httpHostHeader = "shui.knitnet.org";
       };
     };
   };

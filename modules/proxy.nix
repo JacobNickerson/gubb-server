@@ -43,6 +43,39 @@ in
 							};
 						};
 					};
+					cloudflare_tunnel = lib.mkOption {
+						type = lib.types.submodule {
+							options = {
+								enable = lib.mkEnableOption "Expose this service using a cloudflare tunnel";
+								credentialsFile = lib.mkOption {
+									type = lib.types.path;
+									description = "File path to a json credentials file containing the expected cloudflare values";
+								};
+								useHttpBoilerplate = lib.mkEnableOption "Provide typical HTTP service boilerplating";
+								default = lib.mkOption {
+									type = lib.types.nullOr lib.types.str;
+									default = null;
+									description = "Catch-all service if no ingress matches, overrides default set by useHttpBoilerplate";
+									example = "http_status:404";
+								};
+								extra = lib.mkOption {
+									type = lib.types.attrs;
+									default = {};
+									description = ''
+										Extra configuration added to the cloudflare tunnel.
+										Useful for things like defining ingress routes.
+									'';
+									example = {
+										ingress = {
+											"myservice.org" = "http://localhost:80";
+										};
+									};
+								};
+							};
+						};
+						default = {};
+						description = "Helper for setting Cloudflare tunnels with useful defaults";
+					};
 				};
 			}));
 			default = {};
@@ -52,6 +85,12 @@ in
 	};
 
 	config = lib.mkIf cfg.enable {
+		assertions = lib.mapAttrsToList (serviceName: service: {
+			assertion = !service.cloudflare_tunnel.enable || (service.cloudflare_tunnel.useHttpBoilerplate || service.cloudflare_tunnel.default != null);
+
+			message = "myModules.proxy.services.${serviceName}.cloudflare_tunnel must set default (or alternatively use the default value from useHttpBoilerplate)";
+		}) cfg.services;
+
 		services.resolved.enable = false; # Listens on the same port as dnsmasq
 
 		sops.secrets."cloudflare/dns_token" = lib.mkIf cfg.enableACME {};
@@ -95,6 +134,10 @@ in
 			recommendedGzipSettings = true;
 		};
 
+		services.cloudflared = {
+			enable = true;
+		};
+
 		networking.firewall.allowedTCPPorts = [ 80 443 ];
 		networking.firewall.allowedUDPPorts = [ 53 ];
 
@@ -121,5 +164,24 @@ in
 				svc.extra
 			];
 		}) cfg.services;
+
+		services.cloudflared.tunnels = lib.mapAttrs' (name: svc: {
+			name = name;
+			value =  (lib.mkMerge [
+				{
+					credentialsFile = svc.cloudflare_tunnel.credentialsFile;
+					default = lib.mkIf (svc.cloudflare_tunnel.default != null) svc.cloudflare_tunnel.default;
+				}
+				(lib.mkIf svc.cloudflare_tunnel.useHttpBoilerplate {
+					default = lib.mkDefault "http_status:404";
+					ingress = {
+						"${name}.${config.myModules.domain}" = "http://localhost:80"; # Points at nginx, rather than direct service
+					};
+					originRequest.httpHostHeader = "${name}.${config.myModules.domain}";
+				})
+				svc.cloudflare_tunnel.extra
+			]);
+		}) (lib.filterAttrs (_name: svc: svc.cloudflare_tunnel.enable == true)
+		cfg.services);
 	};
 }
