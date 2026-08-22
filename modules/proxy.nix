@@ -167,7 +167,7 @@ in
 		services.dnsmasq.settings.address = lib.mkAfter (
 			lib.mapAttrsToList
 			(name: _svc: "/${name}.${config.myModules.domain}/${config.myModules.server_address}")
-			cfg.services
+			(lib.filterAttrs (_name: svc: svc.dns.enable == true) cfg.services)
 		);
 
 		services.nginx.virtualHosts = lib.mapAttrs' (name: svc: {
@@ -186,7 +186,7 @@ in
 				}
 				svc.nginx.extra
 			];
-		}) cfg.services;
+		}) (lib.filterAttrs (_name: svc: svc.nginx.enable == true) cfg.services);
 
 		services.cloudflared.tunnels = lib.mapAttrs' (name: svc: {
 			name = name;
@@ -204,7 +204,6 @@ in
 				})
 				svc.cloudflare_tunnel.extra
 			]);
-		}) (lib.filterAttrs (_name: svc: svc.cloudflare_tunnel.enable == true)
-		cfg.services);
+		}) (lib.filterAttrs (_name: svc: svc.cloudflare_tunnel.enable == true) cfg.services);
 	};
 }
