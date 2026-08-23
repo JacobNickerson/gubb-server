@@ -51,6 +51,7 @@
     samba.enable = true;
     wireguard = {
       enable = true;
+      port = 42167;
       external_address = "47.199.149.116";
       ext_interface = "enp6s0";
       subnet_prefix = "10.100.0";

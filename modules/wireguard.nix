@@ -14,7 +14,7 @@ in
 
     port = lib.mkOption {
       type = lib.types.int;
-      default = 42167;
+      default = 51820;
       description = "UDP port used by the WireGuard server";
     };
 
