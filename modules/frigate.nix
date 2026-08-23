@@ -10,6 +10,8 @@ let
   frigateConfig = pkgs.formats.yaml { };
 
   frigateSettings = {
+    tls.enabled = false;
+
     mqtt = {
       enabled = true;
       host = config.myModules.server_address;
@@ -118,7 +120,7 @@ in
 
     port = lib.mkOption {
       type = lib.types.int;
-      default = 5000;
+      default = 8971;
       description = "Port for the Frigate web interface";
     };
   };
@@ -158,7 +160,7 @@ in
       image = "ghcr.io/blakeblackshear/frigate:stable";
 
       ports = [
-        "${toString cfg.port}:5000"
+        "${toString cfg.port}:8971"
         "8554:8554"
         "8555:8555/tcp"
         "8555:8555/udp"
