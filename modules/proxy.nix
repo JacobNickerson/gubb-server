@@ -15,26 +15,14 @@ in
 						type = lib.types.port;
 						description = "Local port the service listens on";
 					};
-					dns = lib.mkOption {
-						type = lib.types.submodule {
-							options = {
-								enable = lib.mkEnableOption "Add a DNS entry for this service";
-							};
-						};
-						default = {};
-						description = "";
-					};
+					dns.enable = lib.mkEnableOption "Add a DNS entry for this service";
 					nginx = lib.mkOption {
 						type = lib.types.submodule {
 							options = {
 								enable = lib.mkEnableOption "Setup nginx reverse-proxying to this service";
 								enableACME = lib.mkEnableOption "Enable automatic TLS certificate generation via ACME (Let's Encrypt)"; 
 								dontForceSSL = lib.mkEnableOption "Don't automatically redirect :80 traffic to :443";
-								proxyWebsockets = lib.mkOption {
-									type = lib.types.bool;
-									default = false;
-									description = "Enable WebSocket proxying (proxy_http_version 1.1 + Upgrade headers)";
-								};
+								proxyWebsockets = lib.mkEnableOption "Enable WebSocket proxying (proxy_http_version 1.1 + Upgrade headers)";
 								extraConfig = lib.mkOption {
 									type = lib.types.lines;
 									default = "";
