@@ -35,6 +35,11 @@
       port = 42567;
       model_dir = "/srv/llama/models";
     };
+    minecraft = {
+      enable = true;
+      initMem = "1G";
+      maxMem = "12G";
+    };
     openssh.enable = true;
     open-webui = {
       enable = true;

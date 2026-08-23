@@ -9,6 +9,7 @@
     ./kavita.nix
     ./limine.nix
     ./llama-cpp.nix
+    ./minecraft.nix
     ./mosquitto.nix
     ./openssh.nix
     ./open-webui.nix
