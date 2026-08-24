@@ -165,6 +165,7 @@ in
 					serverName = "${name}.${config.myModules.domain}";
 					useACMEHost = if svc.nginx.enableACME then config.myModules.domain else null;
 					forceSSL = !svc.nginx.dontForceSSL;
+					addSSL = svc.nginx.dontForceSSL;
 					locations."/" = {
 						proxyPass = "http://127.0.0.1:${toString svc.port}";
 						recommendedProxySettings = true;

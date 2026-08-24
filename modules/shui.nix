@@ -144,6 +144,7 @@ in
       dns.enable = true;
       nginx = {
         enable = true;
+        enableACME = true;
         dontForceSSL = true;
         extra = {
           locations."/static/" = {
