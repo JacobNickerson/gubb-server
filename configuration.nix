@@ -40,6 +40,10 @@
       initMem = "1G";
       maxMem = "12G";
     };
+    opencloud = {
+      enable = true;
+      dataDir = "/srv/opencloud";
+    };
     openssh.enable = true;
     open-webui = {
       enable = true;

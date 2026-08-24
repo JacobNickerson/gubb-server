@@ -11,6 +11,7 @@
     ./llama-cpp.nix
     ./minecraft.nix
     ./mosquitto.nix
+    ./opencloud.nix
     ./openssh.nix
     ./open-webui.nix
     ./proxy.nix
