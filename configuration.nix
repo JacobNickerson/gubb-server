@@ -13,8 +13,7 @@
       enable = true;
       domain = "shui-nails";
     };
-    gpu.nvidia.enable = true;
-    gpu.nvidia.powerLimit = 240;
+    gpu.amdgpu.enable = true;
     home-assistant.enable = true;
     immich = {
       enable = true;

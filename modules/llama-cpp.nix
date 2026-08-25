@@ -3,7 +3,9 @@ let
   cfg = config.myModules.llama-cpp;
   llama-pkg = (pkgs.llama-cpp.override {
     cudaSupport = config.myModules.gpu.nvidia.enable;
-    rocmSupport = config.myModules.gpu.amdgpu.enable;
+    # rocmSupport = config.myModules.gpu.amdgpu.enable;
+    rocmSupport = false;  # NOTE: As of 08/24/2026, Vulkan outperforms ROCm for token gen on a 7900XTX
+    vulkanSupport = true;
   });
 in
 {
