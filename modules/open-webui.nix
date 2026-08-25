@@ -30,5 +30,11 @@ in
         proxyWebsockets = true;
       };
     };
+
+    myModules.homepage-dashboard.services.open-webui = {
+      enable = true;
+      name = "Open WebUI";
+      description = "Local LLM Web Interface";
+    };
   };
 }

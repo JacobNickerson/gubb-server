@@ -60,5 +60,12 @@ in
         credentialsFile = config.sops.templates."opencloud-cloudflare.json".path;
       };
     };
+
+    myModules.homepage-dashboard.services.opencloud = {
+      enable = true;
+      name = "OpenCloud";
+      description = "Local File Cloud";
+      category = "files";
+    };
   };
 }

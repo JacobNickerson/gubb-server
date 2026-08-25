@@ -161,5 +161,11 @@ in
         credentialsFile = config.sops.templates."shui-cloudflare.json".path;
       };
     };
+
+    myModules.homepage-dashboard.services.shui = {
+      enable = true;
+      name = "Shui Nails Inventory Management";
+      description = "Inventory Management Service";
+    };
   };
 }

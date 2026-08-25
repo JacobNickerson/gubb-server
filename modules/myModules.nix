@@ -5,6 +5,7 @@
     ./frigate.nix
     ./gpu.nix
     ./home-assistant.nix
+    ./homepage-dashboard.nix
     ./immich.nix
     ./kavita.nix
     ./limine.nix

@@ -49,5 +49,12 @@ in
         proxyWebsockets = true;
       };
     };
+
+    myModules.homepage-dashboard.services.home-assistant = {
+      enable = true;
+      name = "Home Assistant";
+      description = "Home Automation Center";
+      category = "home";
+    };
   };
 }

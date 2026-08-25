@@ -37,6 +37,13 @@ in
       };
     };
 
+    myModules.homepage-dashboard.services.immich = {
+      enable = true;
+      name = "Immich";
+      description = "Local Image Cloud";
+      category = "files";
+    };
+
     services.immich = {
       enable = true;
 

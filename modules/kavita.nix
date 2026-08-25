@@ -65,6 +65,13 @@ in
       };
     };
 
+    myModules.homepage-dashboard.services.kavita = {
+      enable = true;
+      name = "Kavita";
+      description = "Local E-Library";
+      category = "files";
+    };
+
     networking.firewall.allowedTCPPorts = [ cfg.port ];
   };
 }

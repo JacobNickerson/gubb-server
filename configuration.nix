@@ -15,6 +15,7 @@
     };
     gpu.amdgpu.enable = true;
     home-assistant.enable = true;
+    homepage-dashboard.enable = true;
     immich = {
       enable = true;
       port = 42267;

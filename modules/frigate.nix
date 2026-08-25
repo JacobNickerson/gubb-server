@@ -195,5 +195,12 @@ in
         proxyWebsockets = true;
       };
     };
+
+    myModules.homepage-dashboard.services.frigate = {
+      enable = true;
+      name = "Frigate";
+      description = "Local NVR";
+      category = "home";
+    };
   };
 }
