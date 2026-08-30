@@ -3,8 +3,7 @@ let
   cfg = config.myModules.llama-cpp;
   llama-pkg = (pkgs.llama-cpp.override {
     cudaSupport = config.myModules.gpu.nvidia.enable;
-    # rocmSupport = config.myModules.gpu.amdgpu.enable;
-    rocmSupport = false;  # NOTE: As of 08/24/2026, Vulkan outperforms ROCm for token gen on a 7900XTX
+    # rocmSupport = config.myModules.gpu.amdgpu.enable; # NOTE: As of 08/24/2026, Vulkan outperforms ROCm for token gen on a 7900XTX
     vulkanSupport = true;
   });
 in
@@ -40,7 +39,7 @@ in
         host = "127.0.0.1";
         port = cfg.port;
         models-dir = cfg.model_dir;
-        sleep-idle-seconds = 300;
+        sleep-idle-seconds = 1800;
       };
       openFirewall = true;
       package = llama-pkg;
@@ -56,6 +55,10 @@ in
       nginx = {
         enable = true;
         enableACME = true;
+        extraConfig = ''
+          proxy_read_timeout 1800;
+          proxy_send_timeout 1800;
+        '';
       };
     };
   };
