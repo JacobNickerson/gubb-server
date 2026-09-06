@@ -51,6 +51,7 @@
     };
     proxy = {
       enable = true;
+      enableCloudflare = true;
     };
     samba.enable = true;
     wireguard = {

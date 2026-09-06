@@ -121,18 +121,6 @@ in
       ];
     };
 
-    sops.secrets."dashboard/cloudflare_token" = { };
-    sops.secrets."dashboard/cloudflare_tunnel_id" = { };
-    sops.secrets."dashboard/cloudflare_account_id" = { };
-    sops.templates."dashboard-cloudflare.json" = {
-      content = builtins.toJSON {
-        AccountTag = config.sops.placeholder."dashboard/cloudflare_account_id";
-        TunnelSecret = config.sops.placeholder."dashboard/cloudflare_token";
-        TunnelID = config.sops.placeholder."dashboard/cloudflare_tunnel_id";
-        Endpoint = "";
-      };
-    };
-
     myModules.proxy.services.dashboard = {
       port = cfg.port;
       dns.enable = true;
@@ -144,7 +132,6 @@ in
       cloudflare_tunnel = {
         enable = true;
         useHttpBoilerplate = true;
-        credentialsFile = config.sops.templates."dashboard-cloudflare.json".path;
       };
     };
   };

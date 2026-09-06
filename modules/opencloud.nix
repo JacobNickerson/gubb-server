@@ -35,18 +35,6 @@ in
       };
     };
 
-    sops.secrets."opencloud/cloudflare_token" = { };
-    sops.secrets."opencloud/cloudflare_tunnel_id" = { };
-    sops.secrets."opencloud/cloudflare_account_id" = { };
-    sops.templates."opencloud-cloudflare.json" = {
-      content = builtins.toJSON {
-        AccountTag = config.sops.placeholder."opencloud/cloudflare_account_id";
-        TunnelSecret = config.sops.placeholder."opencloud/cloudflare_token";
-        TunnelID = config.sops.placeholder."opencloud/cloudflare_tunnel_id";
-        Endpoint = "";
-      };
-    };
-
     myModules.proxy.services.opencloud = {
       port = cfg.port;
       dns.enable = true;
@@ -63,7 +51,6 @@ in
       cloudflare_tunnel = {
         enable = true;
         useHttpBoilerplate = true;
-        credentialsFile = config.sops.templates."opencloud-cloudflare.json".path;
       };
     };
 

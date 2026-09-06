@@ -13,6 +13,7 @@ in
   options.myModules.proxy = {
     enable = lib.mkEnableOption "DNS, nginx reverse-proxy, and cloudflare tunnel helpers";
     noACME = lib.mkEnableOption "Override per-service ACME settings";
+    enableCloudflare = lib.mkEnableOption "Enable cloudflare tunnel helpers";
     services = lib.mkOption {
       type = lib.types.attrsOf (
         lib.types.submodule (
@@ -63,10 +64,6 @@ in
                 type = lib.types.submodule {
                   options = {
                     enable = lib.mkEnableOption "Expose this service using a cloudflare tunnel";
-                    credentialsFile = lib.mkOption {
-                      type = lib.types.path;
-                      description = "File path to a json credentials file containing the expected cloudflare values";
-                    };
                     useHttpBoilerplate = lib.mkEnableOption "Provide typical HTTP service boilerplating";
                     default = lib.mkOption {
                       type = lib.types.nullOr lib.types.str;
@@ -112,10 +109,40 @@ in
 
     services.resolved.enable = false; # Listens on the same port as dnsmasq
 
-    sops.secrets."cloudflare/dns_token" = lib.mkIf (use_acme && !cfg.noACME) { };
-    sops.templates."cloudflare.env".content = lib.mkIf (use_acme && !cfg.noACME) ''
-      			CLOUDFLARE_DNS_API_TOKEN=${config.sops.placeholder."cloudflare/dns_token"}
-      		'';
+    sops = lib.mkMerge [
+      {
+        secrets."cloudflare/dns_token" =
+          lib.mkIf (use_acme && !cfg.noACME) { };
+
+        templates."cloudflare.env".content =
+          lib.mkIf (use_acme && !cfg.noACME) ''
+            CLOUDFLARE_DNS_API_TOKEN=${config.sops.placeholder."cloudflare/dns_token"}
+          '';
+      }
+
+      (lib.mkIf cfg.enableCloudflare (
+        lib.mkMerge (
+          lib.mapAttrsToList (name: svc: {
+            secrets."${name}/cloudflare_token" = { };
+            secrets."${name}/cloudflare_tunnel_id" = { };
+            secrets."${name}/cloudflare_account_id" = { };
+
+            templates."${name}-cloudflare.json".content = builtins.toJSON {
+                AccountTag =
+                  config.sops.placeholder."${name}/cloudflare_account_id";
+                TunnelSecret =
+                  config.sops.placeholder."${name}/cloudflare_token";
+                TunnelID =
+                  config.sops.placeholder."${name}/cloudflare_tunnel_id";
+                Endpoint = "";
+              };
+          })
+          (lib.filterAttrs
+            (_name: svc: svc.cloudflare_tunnel.enable)
+            cfg.services)
+        )
+      ))
+    ];
 
     security.acme = lib.mkIf (use_acme && !cfg.noACME) {
       # TODO: Make this configurable
@@ -192,12 +219,12 @@ in
       ];
     }) (lib.filterAttrs (_name: svc: svc.nginx.enable == true) cfg.services);
 
-    services.cloudflared.tunnels = lib.mapAttrs' (name: svc: {
+    services.cloudflared.tunnels = lib.mkIf cfg.enableCloudflare (lib.mapAttrs' (name: svc: {
       name = name;
       value = (
         lib.mkMerge [
           {
-            credentialsFile = svc.cloudflare_tunnel.credentialsFile;
+            credentialsFile = config.sops.templates."${name}-cloudflare.json".path;
             default = lib.mkIf (svc.cloudflare_tunnel.default != null) svc.cloudflare_tunnel.default;
           }
           (lib.mkIf svc.cloudflare_tunnel.useHttpBoilerplate {
@@ -210,6 +237,6 @@ in
           svc.cloudflare_tunnel.extra
         ]
       );
-    }) (lib.filterAttrs (_name: svc: svc.cloudflare_tunnel.enable == true) cfg.services);
+    }) (lib.filterAttrs (_name: svc: svc.cloudflare_tunnel.enable == true) cfg.services));
   };
 }

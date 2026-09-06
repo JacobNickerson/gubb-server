@@ -73,18 +73,6 @@ in
       mode = "0400";
     };
 
-    sops.secrets."shui/cloudflare_token" = { };
-    sops.secrets."shui/cloudflare_tunnel_id" = { };
-    sops.secrets."shui/cloudflare_account_id" = { };
-    sops.templates."shui-cloudflare.json" = {
-      content = builtins.toJSON {
-        AccountTag = config.sops.placeholder."shui/cloudflare_account_id";
-        TunnelSecret = config.sops.placeholder."shui/cloudflare_token";
-        TunnelID = config.sops.placeholder."shui/cloudflare_tunnel_id";
-        Endpoint = "";
-      };
-    };
-
     systemd.services.shui-migrate = {
       description = "Run Django migrations and collect static files";
       wantedBy = [ "multi-user.target" ];
@@ -166,7 +154,6 @@ in
       cloudflare_tunnel = {
         enable = true;
         useHttpBoilerplate = true;
-        credentialsFile = config.sops.templates."shui-cloudflare.json".path;
       };
     };
 
