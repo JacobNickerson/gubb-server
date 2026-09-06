@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.myModules.shui;
   version = "0.1.1";
@@ -18,7 +23,7 @@ let
       pkgs.python3Packages.setuptools
       pkgs.python3Packages.wheel
     ];
-    dependencies = shui-deps; 
+    dependencies = shui-deps;
     src = pkgs.fetchFromGitHub {
       owner = "JacobNickerson";
       repo = "shui";
@@ -53,14 +58,14 @@ in
       isSystemUser = true;
       group = "shui";
     };
-    users.groups.shui = {};
+    users.groups.shui = { };
 
     systemd.tmpfiles.rules = [
       "d ${cfg.dataDir} 0750 shui nginx -" # cursed
       "d ${stateDir} 0750 shui nginx -"
     ];
 
-    sops.secrets."shui/secret_key" = {};
+    sops.secrets."shui/secret_key" = { };
     sops.templates."shui.env" = {
       content = ''
         SECRET_KEY=${config.sops.placeholder."shui/secret_key"}
@@ -68,9 +73,9 @@ in
       mode = "0400";
     };
 
-    sops.secrets."shui/cloudflare_token" = {};
-    sops.secrets."shui/cloudflare_tunnel_id" = {};
-    sops.secrets."shui/cloudflare_account_id" = {};
+    sops.secrets."shui/cloudflare_token" = { };
+    sops.secrets."shui/cloudflare_tunnel_id" = { };
+    sops.secrets."shui/cloudflare_account_id" = { };
     sops.templates."shui-cloudflare.json" = {
       content = builtins.toJSON {
         AccountTag = config.sops.placeholder."shui/cloudflare_account_id";
@@ -111,7 +116,10 @@ in
     systemd.services.shui = {
       description = "Shui Inventory WebApp";
       wantedBy = [ "multi-user.target" ];
-      after = [ "network.target" "shui-migrate.service" ];
+      after = [
+        "network.target"
+        "shui-migrate.service"
+      ];
       requires = [ "shui-migrate.service" ];
       environment = {
         ALLOWED_HOSTS = cfg.allowedHosts;
@@ -126,7 +134,7 @@ in
         ExecStart = "${pythonEnv}/bin/gunicorn shui.wsgi:application --bind 127.0.0.1:${toString cfg.port}";
 
         EnvironmentFile = config.sops.templates."shui.env".path;
-        
+
         StateDirectory = "shui";
 
         Restart = "on-failure";

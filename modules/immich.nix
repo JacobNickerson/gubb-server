@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   cfg = config.myModules.immich;
   dataDir = "/srv/immich";
@@ -60,7 +65,8 @@ in
 
       redis.enable = true;
 
-      database = {      # Recommended defaults
+      database = {
+        # Recommended defaults
         enable = true;
         createDB = true;
         name = dbName;

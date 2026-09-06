@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   cfg = config.myModules.kavita;
@@ -31,17 +36,16 @@ in
     systemd.tmpfiles.rules = [
       "d ${dataDir} 0750 kavita kavita -"
     ]
-    ++ lib.optionals (cfg.create-library != null) 
-    [ "d ${cfg.create-library} 0770 kavita users -" ];
+    ++ lib.optionals (cfg.create-library != null) [ "d ${cfg.create-library} 0770 kavita users -" ];
 
     users.users.kavita = {
       isSystemUser = true;
       group = "kavita";
     };
-    users.groups.kavita = {};
+    users.groups.kavita = { };
     users.users.kavita.extraGroups = lib.mkIf cfg.allow-nas [ "smb" ];
 
-    sops.secrets."kavita/token" = {};
+    sops.secrets."kavita/token" = { };
 
     services.kavita = {
       enable = true;

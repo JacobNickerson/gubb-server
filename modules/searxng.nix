@@ -7,13 +7,13 @@ in
     enable = lib.mkEnableOption "SearXNG self-hosted AI web search provider";
     port = lib.mkOption {
       type = lib.types.port;
-      default = 8888; 
-      example = 8888; 
+      default = 8888;
+      example = 8888;
     };
   };
 
   config = lib.mkIf cfg.enable {
-    sops.secrets."searxng/api_key" = {};
+    sops.secrets."searxng/api_key" = { };
     sops.templates."searxng.env" = {
       content = ''
         SEARXNG_SECRET=${config.sops.placeholder."searxng/api_key"}
@@ -21,10 +21,9 @@ in
       mode = "0400";
     };
 
-
     services.searx = {
       enable = true;
-      
+
       environmentFile = config.sops.templates."searxng.env".path;
 
       redisCreateLocally = true;

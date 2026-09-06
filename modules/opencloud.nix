@@ -18,20 +18,26 @@ in
   config = lib.mkIf cfg.enable {
     services.opencloud = {
       enable = true;
-      address = if (lib.attrByPath [ "myModules" "proxy" "services" "opencloud" "nginx" "enable" ] false config) then "127.0.0.1" else "0.0.0.0";
+      address =
+        if
+          (lib.attrByPath [ "myModules" "proxy" "services" "opencloud" "nginx" "enable" ] false config)
+        then
+          "127.0.0.1"
+        else
+          "0.0.0.0";
       port = cfg.port;
       url = "https://opencloud.${config.myModules.domain}";
-      settings = {};
+      settings = { };
       stateDir = cfg.dataDir;
       environment = {
         PROXY_TLS = "false";
-        IDM_ADMIN_PASSWORD="secure-password";
+        IDM_ADMIN_PASSWORD = "secure-password";
       };
     };
 
-    sops.secrets."opencloud/cloudflare_token" = {};
-    sops.secrets."opencloud/cloudflare_tunnel_id" = {};
-    sops.secrets."opencloud/cloudflare_account_id" = {};
+    sops.secrets."opencloud/cloudflare_token" = { };
+    sops.secrets."opencloud/cloudflare_tunnel_id" = { };
+    sops.secrets."opencloud/cloudflare_account_id" = { };
     sops.templates."opencloud-cloudflare.json" = {
       content = builtins.toJSON {
         AccountTag = config.sops.placeholder."opencloud/cloudflare_account_id";

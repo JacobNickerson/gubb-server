@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.myModules.restic;
 in
@@ -13,21 +18,21 @@ in
 
     paths = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [];
+      default = [ ];
       description = "Paths to include in backup";
     };
 
     exclude = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [];
+      default = [ ];
       description = "Paths to explicitly exclude in backup";
     };
   };
 
   config = lib.mkIf cfg.enable {
-    sops.secrets."restic/passwd" = {};
-    sops.secrets."restic/account_id" = {};
-    sops.secrets."restic/account_key" = {};
+    sops.secrets."restic/passwd" = { };
+    sops.secrets."restic/account_id" = { };
+    sops.secrets."restic/account_key" = { };
 
     sops.templates."restic.env".content = ''
       B2_ACCOUNT_ID=${config.sops.placeholder."restic/account_id"}
@@ -38,7 +43,7 @@ in
       initialize = true;
       repository = cfg.repo;
       passwordFile = config.sops.secrets."restic/passwd".path;
-      environmentFile = config.sops.templates."restic.env".path; 
+      environmentFile = config.sops.templates."restic.env".path;
 
       paths = cfg.paths;
       exclude = cfg.exclude;

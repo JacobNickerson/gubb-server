@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.myModules.gpu;
   nv_command = "${config.hardware.nvidia.package.bin}/bin/nvidia-smi";
@@ -16,7 +21,7 @@ in
           };
         };
       };
-      default = {};
+      default = { };
       description = "Nvidia GPU settings";
     };
     amdgpu = lib.mkOption {
@@ -25,7 +30,7 @@ in
           enable = lib.mkEnableOption "Enable AMD GPU drivers";
         };
       };
-      default = {};
+      default = { };
       description = "AMD GPU settings";
     };
     intel = lib.mkOption {
@@ -34,7 +39,7 @@ in
           enable = lib.mkEnableOption "Enable Intel GPU drivers";
         };
       };
-      default = {};
+      default = { };
       description = "Intel GPU settings";
     };
   };
@@ -46,7 +51,7 @@ in
         enable32Bit = true;
       };
     })
-    
+
     (lib.mkIf cfg.nvidia.enable {
       services.xserver.videoDrivers = lib.mkAfter [ "nvidia" ];
       hardware.nvidia = {
@@ -57,8 +62,8 @@ in
         nvidiaPersistenced = true;
       };
       boot.kernelParams = [
-        "nvidia.NVreg_PreserveVideoMemoryAllocations=1"  # May cause instability, remove if so
-      ]; 
+        "nvidia.NVreg_PreserveVideoMemoryAllocations=1" # May cause instability, remove if so
+      ];
     })
 
     (lib.mkIf (cfg.nvidia.enable && cfg.nvidia.powerLimit != null) {
@@ -95,7 +100,7 @@ in
       boot.initrd.kernelModules = [ "amdgpu" ];
       boot.kernelParams = [
         "amdgpu.ppfeaturemask=0xffffffff"
-      ];  
+      ];
       services.lact.enable = true;
     })
 

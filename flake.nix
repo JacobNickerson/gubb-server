@@ -4,14 +4,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
-    	url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    jake-flake = {
-      url = "github:jacobnickerson/nix-config";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
+    jake-flake.url = "github:jacobnickerson/nix-config";
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -19,46 +15,66 @@
     vscode-server.url = "github:nix-community/nixos-vscode-server";
   };
 
-  outputs = { nixpkgs, home-manager, vscode-server, sops-nix, jake-flake, ... }@inputs:
-  let
-    system = "x86_64-linux";
+  outputs =
+    {
+      nixpkgs,
+      home-manager,
+      vscode-server,
+      sops-nix,
+      jake-flake,
+      ...
+    }@inputs:
+    let
+      system = "x86_64-linux";
 
-    pkgs = import nixpkgs {
-      inherit system;
-      config.allowUnfree = true;
-      overlays = [ ];
-    };
-
-    mkHost = { hostname, config, hostConfig, users ? [] }:
-      nixpkgs.lib.nixosSystem {
-        inherit system pkgs;
-        specialArgs = { inherit inputs; };
-        modules = [
-          ({ ... }: { networking.hostName = hostname; })
-          config
-          hostConfig
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = { inherit inputs; hostname = hostname; };
-            home-manager.sharedModules = [ jake-flake.homeModules.default ];
-          }
-          sops-nix.nixosModules.sops
-          vscode-server.nixosModules.default
-        ] ++ users;
-      };  
-  in {
-    nixosConfigurations = {
-      GubbServer = mkHost {
-        hostname = "GubbServer";
-        config = ./configuration.nix;
-        hostConfig = ./host-configuration.nix;
-        users = [
-          ./users/jacobnickerson.nix
-          ./users/slyniashi.nix
-        ];
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+        overlays = [ ];
       };
+
+      mkHost =
+        {
+          hostname,
+          config,
+          hostConfig,
+          users ? [ ],
+        }:
+        nixpkgs.lib.nixosSystem {
+          inherit system pkgs;
+          specialArgs = { inherit inputs; };
+          modules = [
+            ({ ... }: { networking.hostName = hostname; })
+            config
+            hostConfig
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = {
+                inherit inputs;
+                hostname = hostname;
+              };
+              home-manager.sharedModules = [ jake-flake.homeModules.default ];
+            }
+            sops-nix.nixosModules.sops
+            vscode-server.nixosModules.default
+          ]
+          ++ users;
+        };
+    in
+    {
+      nixosConfigurations = {
+        GubbServer = mkHost {
+          hostname = "GubbServer";
+          config = ./configuration.nix;
+          hostConfig = ./host-configuration.nix;
+          users = [
+            ./users/jacobnickerson.nix
+            ./users/slyniashi.nix
+          ];
+        };
+      };
+      formatter."${system}" = pkgs.nixfmt-tree;
     };
-  };
 }

@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.myModules.home-assistant;
   port = 8123;
@@ -29,15 +34,15 @@ in
       config = {
         # Includes dependencies for a basic setup
         # https://www.home-assistant.io/integrations/default_config/
-        default_config = {};
-        mqtt = {};
+        default_config = { };
+        mqtt = { };
         #http = {
         #  use_x_forwarded_for = true;
         #  trusted_proxies = [ "127.0.0.1" ];
         #};
       };
     };
-    
+
     networking.firewall.allowedTCPPorts = [ port ];
 
     myModules.proxy.services.home-assistant = {

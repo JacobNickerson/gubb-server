@@ -91,7 +91,10 @@
     fish.enable = true;
   };
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   networking = {
     wireless.enable = false;
@@ -146,7 +149,7 @@
     "d /srv/postgresql 750 postgres postgres -"
     "d /swap 755 root root -"
   ];
-  
+
   services.postgresql.dataDir = "/srv/postgresql";
 
   # Allowing lid to close

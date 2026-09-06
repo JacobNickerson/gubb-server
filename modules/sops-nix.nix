@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.myModules.sops-nix;
 in
@@ -20,14 +25,16 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    sops = lib.optionalAttrs (cfg.defaultSopsFile != null) {
-      defaultSopsFile = cfg.defaultSopsFile;
-    } // {
-      age = {
-        keyFile = cfg.ageKeyFile;
-        generateKey = true;
+    sops =
+      lib.optionalAttrs (cfg.defaultSopsFile != null) {
+        defaultSopsFile = cfg.defaultSopsFile;
+      }
+      // {
+        age = {
+          keyFile = cfg.ageKeyFile;
+          generateKey = true;
+        };
       };
-    };
 
     environment.systemPackages = with pkgs; [
       age

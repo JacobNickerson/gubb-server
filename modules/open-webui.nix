@@ -7,8 +7,8 @@ in
     enable = lib.mkEnableOption "Open WebUI";
     port = lib.mkOption {
       type = lib.types.port;
-      default = 3000; 
-      example = 3000; 
+      default = 3000;
+      example = 3000;
     };
   };
 

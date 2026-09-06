@@ -9,7 +9,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    users.groups.smb = {};
+    users.groups.smb = { };
     systemd.tmpfiles.rules = [
       "d ${smb_dir} 0770 root smb -"
     ];
@@ -50,8 +50,10 @@ in
     };
 
     # NOTE: SAMBA does not use the usual proxy config because it doesn't use HTTP/S
-    services.dnsmasq.settings.address = lib.mkIf config.myModules.proxy.enable (lib.mkAfter [
-      "/nas.${config.myModules.domain}/${config.myModules.server_address}"
-    ]);
+    services.dnsmasq.settings.address = lib.mkIf config.myModules.proxy.enable (
+      lib.mkAfter [
+        "/nas.${config.myModules.domain}/${config.myModules.server_address}"
+      ]
+    );
   };
 }

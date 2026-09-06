@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.myModules.homepage-dashboard;
 in
@@ -10,39 +15,43 @@ in
       default = 3000;
     };
     services = lib.mkOption {
-      type = lib.types.attrsOf (lib.types.submodule ({ name, ... }: {
-        options = {
-          enable = lib.mkEnableOption "Add a widget for this service";
+      type = lib.types.attrsOf (
+        lib.types.submodule (
+          { name, ... }: {
+            options = {
+              enable = lib.mkEnableOption "Add a widget for this service";
 
-          name = lib.mkOption {
-            type = lib.types.nullOr lib.types.str;
-            default = null;
-            description = "Display name for the service card";
-          };
-          
-          description = lib.mkOption {
-            type = lib.types.str;
-            default = "configure me!";
-            description = "Description of the service";
-          };
+              name = lib.mkOption {
+                type = lib.types.nullOr lib.types.str;
+                default = null;
+                description = "Display name for the service card";
+              };
 
-          category = lib.mkOption {
-            type = lib.types.str;
-            default = "other";
-            description = "Category to list this service under";
-          };
+              description = lib.mkOption {
+                type = lib.types.str;
+                default = "configure me!";
+                description = "Description of the service";
+              };
 
-          extraSettings = lib.mkOption {
-            type = lib.types.attrs;
-            default = {};
-            description = "Extra settings for the widget";
-            example = {
+              category = lib.mkOption {
+                type = lib.types.str;
+                default = "other";
+                description = "Category to list this service under";
+              };
 
+              extraSettings = lib.mkOption {
+                type = lib.types.attrs;
+                default = { };
+                description = "Extra settings for the widget";
+                example = {
+
+                };
+              };
             };
-          };
-        };
-      }));
-      default = {};
+          }
+        )
+      );
+      default = { };
       description = "Services to add as widgets to the homepage dashboard";
     };
   };
@@ -68,41 +77,53 @@ in
 
       services = [
         {
-          "Home" = (lib.mapAttrsToList (name: svc: {
-            "${if svc.name != null then svc.name else name}" = {
-              href = "https://${name}.${config.myModules.domain}";
-              description = svc.description;
-              # icon = svc.icon;
-              extraSettings = svc.extraSettings;
-            };
-          }) (lib.filterAttrs (_name: svc: svc.enable == true && svc.category == "home") cfg.services));
+          "Home" = (
+            lib.mapAttrsToList (name: svc: {
+              "${if svc.name != null then svc.name else name}" = {
+                href = "https://${name}.${config.myModules.domain}";
+                description = svc.description;
+                # icon = svc.icon;
+                extraSettings = svc.extraSettings;
+              };
+            }) (lib.filterAttrs (_name: svc: svc.enable == true && svc.category == "home") cfg.services)
+          );
         }
         {
-          "Files" = (lib.mapAttrsToList (name: svc: {
-            "${if svc.name != null then svc.name else name}" = {
-              href = "https://${name}.${config.myModules.domain}";
-              description = svc.description;
-              # icon = svc.icon;
-              extraSettings = svc.extraSettings;
-            };
-          }) (lib.filterAttrs (_name: svc: svc.enable == true && svc.category == "files") cfg.services));
+          "Files" = (
+            lib.mapAttrsToList (name: svc: {
+              "${if svc.name != null then svc.name else name}" = {
+                href = "https://${name}.${config.myModules.domain}";
+                description = svc.description;
+                # icon = svc.icon;
+                extraSettings = svc.extraSettings;
+              };
+            }) (lib.filterAttrs (_name: svc: svc.enable == true && svc.category == "files") cfg.services)
+          );
         }
         {
-          "Other" = (lib.mapAttrsToList (name: svc: {
-            "${if svc.name != null then svc.name else name}" = {
-              href = "https://${name}.${config.myModules.domain}";
-              description = svc.description;
-              # icon = svc.icon;
-              extraSettings = svc.extraSettings;
-            };
-          }) (lib.filterAttrs (_name: svc: svc.enable == true && svc.category != "files" && svc.category != "home") cfg.services));
+          "Other" = (
+            lib.mapAttrsToList
+              (name: svc: {
+                "${if svc.name != null then svc.name else name}" = {
+                  href = "https://${name}.${config.myModules.domain}";
+                  description = svc.description;
+                  # icon = svc.icon;
+                  extraSettings = svc.extraSettings;
+                };
+              })
+              (
+                lib.filterAttrs (
+                  _name: svc: svc.enable == true && svc.category != "files" && svc.category != "home"
+                ) cfg.services
+              )
+          );
         }
       ];
     };
 
-    sops.secrets."dashboard/cloudflare_token" = {};
-    sops.secrets."dashboard/cloudflare_tunnel_id" = {};
-    sops.secrets."dashboard/cloudflare_account_id" = {};
+    sops.secrets."dashboard/cloudflare_token" = { };
+    sops.secrets."dashboard/cloudflare_tunnel_id" = { };
+    sops.secrets."dashboard/cloudflare_account_id" = { };
     sops.templates."dashboard-cloudflare.json" = {
       content = builtins.toJSON {
         AccountTag = config.sops.placeholder."dashboard/cloudflare_account_id";

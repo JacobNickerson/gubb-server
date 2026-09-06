@@ -1,27 +1,36 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.myModules.minecraft;
 
-  sizeToBytes = s:
+  sizeToBytes =
+    s:
     let
       m = builtins.match "^([0-9]+)([KMGkmg])$" s;
       n = builtins.fromJSON (builtins.elemAt m 0);
       unit = builtins.elemAt m 1;
       multiplier =
-        if unit == "K" || unit == "k" then 1024
-        else if unit == "M" || unit == "m" then 1024 * 1024
-        else 1024 * 1024 * 1024;
+        if unit == "K" || unit == "k" then
+          1024
+        else if unit == "M" || unit == "m" then
+          1024 * 1024
+        else
+          1024 * 1024 * 1024;
     in
-      n * multiplier;
+    n * multiplier;
 in
 {
   options.myModules.minecraft = {
     enable = lib.mkEnableOption "A template for a new module";
     port = lib.mkOption {
-      type = lib.types.port; 
+      type = lib.types.port;
       default = 25565;
       description = "Port to listen on";
-    }; 
+    };
     initMem = lib.mkOption {
       type = lib.types.strMatching "^[0-9]+[KMGkmg]$";
       default = "1G";

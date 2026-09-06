@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   cfg = config.myModules.wireguard;
   key_dir = "/etc/systemd/network/keys";
@@ -69,20 +74,24 @@ in
       };
 
       wireguardPeers = [
-        { # PortaJake
+        {
+          # PortaJake
           PublicKey = "q0PVIe44Zhduc7SHLpWvxrGROEvEZmawMVj7fAfrIxM=";
           AllowedIPs = [ "${cfg.subnet_prefix}.2/32" ];
           PersistentKeepalive = 25;
         }
-        { # PhoneJake
+        {
+          # PhoneJake
           PublicKey = "e+sZpu+5OfFn5Lxqsb/sytqv1auf07HgxzUS0oT4Cmg=";
           AllowedIPs = [ "${cfg.subnet_prefix}.3/32" ];
         }
-        { # BunPhone
+        {
+          # BunPhone
           PublicKey = "h4WOuljd3KTSWDJ6bWISmJhi46FWAqO+LvD4sPgUkHc=";
           AllowedIPs = [ "${cfg.subnet_prefix}.5/32" ];
         }
-        { # BunTop
+        {
+          # BunTop
           PublicKey = "+ENI1SFf02yH04jWmIwnVcMVYywkOkTbvggKa0MrkQE=";
           AllowedIPs = [ "${cfg.subnet_prefix}.6/32" ];
         }
@@ -104,9 +113,11 @@ in
 
     # NOTE: WireGuard does not use the usual proxy config because it doesn't use HTTP/S
     #       Additionally it routes to external IP because it broke the clients if it routes to local
-    services.dnsmasq.settings.address = lib.mkIf config.myModules.proxy.enable (lib.mkAfter [
-      "/vpn.${config.myModules.domain}/${cfg.external_address}"
-    ]);
+    services.dnsmasq.settings.address = lib.mkIf config.myModules.proxy.enable (
+      lib.mkAfter [
+        "/vpn.${config.myModules.domain}/${cfg.external_address}"
+      ]
+    );
 
     environment.systemPackages = with pkgs; [
       wireguard-tools

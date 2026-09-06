@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.myModules.frigate;
   frigateDir = "/srv/frigate";
@@ -53,7 +58,10 @@ let
           {
             path = "rtsp://127.0.0.1:8554/a_cam";
             input_args = "preset-rtsp-restream";
-            roles = [ "record" "audio" ];
+            roles = [
+              "record"
+              "audio"
+            ];
           }
           {
             path = "rtsp://127.0.0.1:8554/a_cam_alt";
@@ -85,7 +93,10 @@ let
           {
             path = "rtsp://127.0.0.1:8554/z_cam";
             input_args = "preset-rtsp-restream";
-            roles = [ "record" "audio" ];
+            roles = [
+              "record"
+              "audio"
+            ];
           }
           {
             path = "rtsp://127.0.0.1:8554/z_cam_alt";
@@ -130,7 +141,7 @@ in
       isSystemUser = true;
       group = "frigate";
     };
-    users.groups.frigate = {};
+    users.groups.frigate = { };
     systemd.tmpfiles.rules = [
       "d ${frigateDir} 0750 frigate frigate -"
       "d ${dataDir} 0750 frigate frigate -"
@@ -139,11 +150,11 @@ in
 
     environment.etc."frigate/config.yml".source = frigateConfig.generate "frigate.yml" frigateSettings;
 
-    sops.secrets."frigate/a_user" = {};
-    sops.secrets."frigate/a_pass" = {};
-    sops.secrets."frigate/z_user" = {};
-    sops.secrets."frigate/z_pass" = {};
-    sops.secrets."frigate/mqtt_pass" = {};
+    sops.secrets."frigate/a_user" = { };
+    sops.secrets."frigate/a_pass" = { };
+    sops.secrets."frigate/z_user" = { };
+    sops.secrets."frigate/z_pass" = { };
+    sops.secrets."frigate/mqtt_pass" = { };
 
     sops.templates."frigate.env" = {
       content = ''
