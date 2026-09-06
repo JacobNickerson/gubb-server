@@ -6,6 +6,12 @@
 }:
 let
   cfg = config.myModules.homepage-dashboard;
+  proxy_href =
+    name:
+    if config.myModules.proxy.enable then
+      "${if config.myModules.proxy.noACME then "http" else "https"}://${name}.${config.myModules.domain}"
+    else
+      "${config.myModules.server_address}:${config.myModules.proxy.services.${name}.port}";
 in
 {
   options.myModules.homepage-dashboard = {
@@ -80,7 +86,7 @@ in
           "Home" = (
             lib.mapAttrsToList (name: svc: {
               "${if svc.name != null then svc.name else name}" = {
-                href = "https://${name}.${config.myModules.domain}";
+                href = proxy_href name;
                 description = svc.description;
                 # icon = svc.icon;
                 extraSettings = svc.extraSettings;
@@ -92,7 +98,7 @@ in
           "Files" = (
             lib.mapAttrsToList (name: svc: {
               "${if svc.name != null then svc.name else name}" = {
-                href = "https://${name}.${config.myModules.domain}";
+                href = proxy_href name;
                 description = svc.description;
                 # icon = svc.icon;
                 extraSettings = svc.extraSettings;
@@ -105,7 +111,7 @@ in
             lib.mapAttrsToList
               (name: svc: {
                 "${if svc.name != null then svc.name else name}" = {
-                  href = "https://${name}.${config.myModules.domain}";
+                  href = proxy_href name;
                   description = svc.description;
                   # icon = svc.icon;
                   extraSettings = svc.extraSettings;
