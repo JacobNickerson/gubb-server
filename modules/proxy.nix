@@ -12,7 +12,7 @@ in
 {
   options.myModules.proxy = {
     enable = lib.mkEnableOption "DNS, nginx reverse-proxy, and cloudflare tunnel helpers";
-
+    noACME = lib.mkEnableOption "Override per-service ACME settings";
     services = lib.mkOption {
       type = lib.types.attrsOf (
         lib.types.submodule (
@@ -112,12 +112,12 @@ in
 
     services.resolved.enable = false; # Listens on the same port as dnsmasq
 
-    sops.secrets."cloudflare/dns_token" = lib.mkIf use_acme { };
-    sops.templates."cloudflare.env".content = lib.mkIf use_acme ''
+    sops.secrets."cloudflare/dns_token" = lib.mkIf (use_acme && !cfg.noACME) { };
+    sops.templates."cloudflare.env".content = lib.mkIf (use_acme && !cfg.noACME) ''
       			CLOUDFLARE_DNS_API_TOKEN=${config.sops.placeholder."cloudflare/dns_token"}
       		'';
 
-    security.acme = lib.mkIf use_acme {
+    security.acme = lib.mkIf (use_acme && !cfg.noACME) {
       # TODO: Make this configurable
       acceptTerms = true;
       defaults.email = "jacobmilesnickerson@gmail.com";
@@ -178,9 +178,9 @@ in
       value = lib.mkMerge [
         {
           serverName = "${name}.${config.myModules.domain}";
-          useACMEHost = if svc.nginx.enableACME then config.myModules.domain else null;
-          forceSSL = !svc.nginx.dontForceSSL;
-          addSSL = svc.nginx.dontForceSSL;
+          useACMEHost = if (svc.nginx.enableACME && !cfg.noACME) then config.myModules.domain else null;
+          forceSSL = (!svc.nginx.dontForceSSL && !cfg.noACME);
+          addSSL = (svc.nginx.dontForceSSL && !cfg.noACME);
           locations."/" = {
             proxyPass = "http://127.0.0.1:${toString svc.port}";
             recommendedProxySettings = true;
