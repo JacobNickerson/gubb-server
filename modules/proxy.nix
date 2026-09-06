@@ -111,13 +111,11 @@ in
 
     sops = lib.mkMerge [
       {
-        secrets."cloudflare/dns_token" =
-          lib.mkIf (use_acme && !cfg.noACME) { };
+        secrets."cloudflare/dns_token" = lib.mkIf (use_acme && !cfg.noACME) { };
 
-        templates."cloudflare.env".content =
-          lib.mkIf (use_acme && !cfg.noACME) ''
-            CLOUDFLARE_DNS_API_TOKEN=${config.sops.placeholder."cloudflare/dns_token"}
-          '';
+        templates."cloudflare.env".content = lib.mkIf (use_acme && !cfg.noACME) ''
+          CLOUDFLARE_DNS_API_TOKEN=${config.sops.placeholder."cloudflare/dns_token"}
+        '';
       }
 
       (lib.mkIf cfg.enableCloudflare (
@@ -128,18 +126,12 @@ in
             secrets."${name}/cloudflare_account_id" = { };
 
             templates."${name}-cloudflare.json".content = builtins.toJSON {
-                AccountTag =
-                  config.sops.placeholder."${name}/cloudflare_account_id";
-                TunnelSecret =
-                  config.sops.placeholder."${name}/cloudflare_token";
-                TunnelID =
-                  config.sops.placeholder."${name}/cloudflare_tunnel_id";
-                Endpoint = "";
-              };
-          })
-          (lib.filterAttrs
-            (_name: svc: svc.cloudflare_tunnel.enable)
-            cfg.services)
+              AccountTag = config.sops.placeholder."${name}/cloudflare_account_id";
+              TunnelSecret = config.sops.placeholder."${name}/cloudflare_token";
+              TunnelID = config.sops.placeholder."${name}/cloudflare_tunnel_id";
+              Endpoint = "";
+            };
+          }) (lib.filterAttrs (_name: svc: svc.cloudflare_tunnel.enable) cfg.services)
         )
       ))
     ];
@@ -219,24 +211,26 @@ in
       ];
     }) (lib.filterAttrs (_name: svc: svc.nginx.enable == true) cfg.services);
 
-    services.cloudflared.tunnels = lib.mkIf cfg.enableCloudflare (lib.mapAttrs' (name: svc: {
-      name = name;
-      value = (
-        lib.mkMerge [
-          {
-            credentialsFile = config.sops.templates."${name}-cloudflare.json".path;
-            default = lib.mkIf (svc.cloudflare_tunnel.default != null) svc.cloudflare_tunnel.default;
-          }
-          (lib.mkIf svc.cloudflare_tunnel.useHttpBoilerplate {
-            default = lib.mkDefault "http_status:404";
-            ingress = {
-              "${name}.${config.myModules.domain}" = "http://localhost:80"; # Points at nginx, rather than direct service
-            };
-            originRequest.httpHostHeader = "${name}.${config.myModules.domain}";
-          })
-          svc.cloudflare_tunnel.extra
-        ]
-      );
-    }) (lib.filterAttrs (_name: svc: svc.cloudflare_tunnel.enable == true) cfg.services));
+    services.cloudflared.tunnels = lib.mkIf cfg.enableCloudflare (
+      lib.mapAttrs' (name: svc: {
+        name = name;
+        value = (
+          lib.mkMerge [
+            {
+              credentialsFile = config.sops.templates."${name}-cloudflare.json".path;
+              default = lib.mkIf (svc.cloudflare_tunnel.default != null) svc.cloudflare_tunnel.default;
+            }
+            (lib.mkIf svc.cloudflare_tunnel.useHttpBoilerplate {
+              default = lib.mkDefault "http_status:404";
+              ingress = {
+                "${name}.${config.myModules.domain}" = "http://localhost:80"; # Points at nginx, rather than direct service
+              };
+              originRequest.httpHostHeader = "${name}.${config.myModules.domain}";
+            })
+            svc.cloudflare_tunnel.extra
+          ]
+        );
+      }) (lib.filterAttrs (_name: svc: svc.cloudflare_tunnel.enable == true) cfg.services)
+    );
   };
 }
