@@ -55,7 +55,10 @@
                 inherit inputs;
                 hostname = hostname;
               };
-              home-manager.sharedModules = [ jake-flake.homeModules.default ];
+              home-manager.sharedModules = [
+                jake-flake.homeModules.default
+                sops-nix.homeManagerModules.sops
+              ];
             }
             sops-nix.nixosModules.sops
             vscode-server.nixosModules.default
